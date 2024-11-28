@@ -71,6 +71,7 @@ public final class Main {
         ObjectMapper objectMapper = new ObjectMapper();
         File file = new File(CheckerConstants.TESTS_PATH + filePath1);
         ObjectInput inputData = objectMapper.readValue(file, ObjectInput.class);
+
         ArrayNode output = objectMapper.createArrayNode();
 
         /*
