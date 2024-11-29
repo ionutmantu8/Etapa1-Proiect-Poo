@@ -3,15 +3,13 @@ package org.poo.banking;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.poo.commandutils.AddAccount;
-import org.poo.commandutils.AddFunds;
-import org.poo.commandutils.CreateCard;
-import org.poo.commandutils.PrintUsers;
+import org.poo.commandutils.*;
 import org.poo.fileio.CommandInput;
 import org.poo.fileio.ExchangeInput;
 import org.poo.fileio.ObjectInput;
 import org.poo.fileio.UserInput;
 import org.poo.userutils.User;
+import org.poo.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -21,7 +19,7 @@ public class Bank {
         ArrayNode output = mapper.createArrayNode();
         UserInput[] users = inputData.getUsers();
         ArrayList<User> usersList = new ArrayList<>();
-
+        Utils.resetRandom();
         for(int i = 0; i < users.length; i++) {
             usersList.add(new User());
             usersList
@@ -56,8 +54,10 @@ public class Bank {
                 case "addAccount" -> AddAccount.addAccount(usersList, commandInput);
                 case "createCard" -> CreateCard.createCard(usersList, commandInput);
                 case "addFunds" -> AddFunds.addFunds(usersList, commandInput);
-                case "deleteAccount" ->
-
+                case "deleteAccount" -> DeleteAccount.deleteAccount(usersList, commandInput, node, output);
+                case "createOneTimeCard" -> CreateOneTimeCard.createOneTimeCard(usersList, commandInput);
+                case "deleteCard" -> DeleteCard.deleteCard(usersList, commandInput);
+                case "payOnline" -> PayOnline.payOnline(usersList, commandInput, exchangeRates, node, output,mapper);
             }
         }
 

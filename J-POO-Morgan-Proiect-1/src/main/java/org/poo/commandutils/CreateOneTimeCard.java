@@ -8,34 +8,24 @@ import org.poo.utils.Utils;
 
 import java.util.ArrayList;
 
-public class CreateCard {
+public class CreateOneTimeCard {
 
 
-    public static Account findAccountByIban(User user, String IBAN){
-      for(Account account : user.getAccounts()){
-          if(account.getIBAN().equals(IBAN))
-              return account;
-      }
-        return null;
-    }
-    public static void createCard(ArrayList<User> userList, CommandInput command) {
+
+    public static void createOneTimeCard(ArrayList<User> users, CommandInput command){
         String IBAN = command.getAccount();
         String email = command.getEmail();
-        User user = AddAccount.findUserByEmail(userList, email);
+        User user = AddAccount.findUserByEmail(users, email);
         if(user != null) {
-            Account account = findAccountByIban(user, IBAN);
+            Account account = CreateCard.findAccountByIban(user, IBAN);
             if(account != null){
                 Card newCard = new Card();
-                newCard.setOneTime(false);
+                newCard.setOneTime(true);
                 newCard.setCardNumber(Utils.generateCardNumber());
                 newCard.setTimeStamp(command.getTimestamp());
                 newCard.setActive(true);
                 account.getCards().add(newCard);
             }
         }
-
-
-
-
     }
 }
