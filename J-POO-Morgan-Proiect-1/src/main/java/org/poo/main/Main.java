@@ -3,6 +3,7 @@ package org.poo.main;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.poo.banking.Bank;
 import org.poo.checker.Checker;
 import org.poo.checker.CheckerConstants;
 import org.poo.fileio.ObjectInput;
@@ -71,8 +72,8 @@ public final class Main {
         ObjectMapper objectMapper = new ObjectMapper();
         File file = new File(CheckerConstants.TESTS_PATH + filePath1);
         ObjectInput inputData = objectMapper.readValue(file, ObjectInput.class);
-        System.out.println(inputData);
-        ArrayNode output = objectMapper.createArrayNode();
+        Bank bank = new Bank();
+        ArrayNode output = bank.startBanking(inputData);
 
         /*
          * TODO Implement your function here
