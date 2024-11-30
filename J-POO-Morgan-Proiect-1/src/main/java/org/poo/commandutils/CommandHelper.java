@@ -8,17 +8,17 @@ import org.poo.userutils.User;
 import java.util.*;
 
 public class CommandHelper {
-    public static User findUserByEmail(ArrayList<User> usersList, String accountEmail){
-        for(User user : usersList){
-            if(user.getEmail().equals(accountEmail))
+    public static User findUserByEmail(ArrayList<User> usersList, String accountEmail) {
+        for (User user : usersList) {
+            if (user.getEmail().equals(accountEmail))
                 return user;
         }
         return null;
     }
 
-    public static Account findAccountByIban(User user, String IBAN){
-        for(Account account : user.getAccounts()){
-            if(account.getIBAN().equals(IBAN))
+    public static Account findAccountByIban(User user, String IBAN) {
+        for (Account account : user.getAccounts()) {
+            if (account.getIBAN().equals(IBAN))
                 return account;
         }
         return null;
@@ -97,10 +97,11 @@ public class CommandHelper {
         double rate = findBestRate(from, to, graph);
         return amount * rate;
     }
-    public static Account findAccountByIBANWithoutEmail(ArrayList<User> users, String IBAN){
-        for(User user : users){
-            for(Account account : user.getAccounts()){
-                if(account.getIBAN().equals(IBAN))
+
+    public static Account findAccountByIBANWithoutEmail(ArrayList<User> users, String IBAN) {
+        for (User user : users) {
+            for (Account account : user.getAccounts()) {
+                if (account.getIBAN().equals(IBAN))
                     return account;
 
             }
@@ -108,4 +109,19 @@ public class CommandHelper {
         return null;
 
     }
+
+    public static Account findAccountByIBANOrAlias(ArrayList<User> users, String identifier) {
+       for(User user : users){
+           for(Account account : user.getAccounts()){
+               if(account.getIBAN().equals(identifier) ||(account.getAlias() != null && account.getAlias().equals(identifier)))
+                   return account;
+           }
+       }
+        return null;
+
+    }
+
+
+
+
 }

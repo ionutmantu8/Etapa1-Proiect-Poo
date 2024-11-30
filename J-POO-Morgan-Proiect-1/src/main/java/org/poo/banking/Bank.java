@@ -59,6 +59,8 @@ public class Bank {
                 case "deleteCard" -> DeleteCard.deleteCard(usersList, commandInput);
                 case "payOnline" -> PayOnline.payOnline(usersList, commandInput, exchangeRates, node, output,mapper);
                 case "sendMoney" -> SendMoney.sendMoney(usersList, commandInput, exchangeRates);
+                case "setAlias" -> SetAlias.setAlias(usersList, commandInput);
+                case "printTransactions" -> PrintTransactions.printTransactions(usersList, commandInput, mapper, node, output);
             }
         }
 

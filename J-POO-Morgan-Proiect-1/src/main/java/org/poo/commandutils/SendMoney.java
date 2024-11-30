@@ -10,35 +10,45 @@ import java.util.ArrayList;
 public class SendMoney {
     public static void sendMoney(final ArrayList<User> users, final CommandInput command,
                                  final ArrayList<ExchangeRate> exchangeRates) {
-        String sendingIBAN = command.getAccount();
-        String receiverIBAN = command.getReceiver();
+        String senderIdentifier = command.getAccount();
+        String receiverIdentifier = command.getReceiver();
         double amount = command.getAmount();
         String email = command.getEmail();
 
-        User user = CommandHelper.findUserByEmail(users, email);
+        User senderUser = CommandHelper.findUserByEmail(users, email);
 
-        if (user != null) {
-            Account sending = CommandHelper.findAccountByIban(user, sendingIBAN);
-            Account receiver = CommandHelper.findAccountByIBANWithoutEmail(users, receiverIBAN);
+        if (senderUser != null) {
+            Account sender = CommandHelper.findAccountByIBANOrAlias(users, senderIdentifier);
+            Account receiver = CommandHelper.findAccountByIBANOrAlias(users, receiverIdentifier);
 
-            if (sending != null && receiver != null) {
-                if (sending.getBalance() < amount) {
-                    return;
-                }
+            if (sender == null) {
+                System.out.println("Sender account not found!");
+                return;
+            }
 
-                if (sending.getCurrency().equals(receiver.getCurrency())) {
-                    sending.setBalance(sending.getBalance() - amount);
-                    receiver.setBalance(receiver.getBalance() + amount);
-                } else {
-                    double convertedAmount = CommandHelper.convertCurrency(amount, sending.getCurrency(), receiver.getCurrency(), exchangeRates);
+            if (receiver == null) {
+                System.out.println("Receiver account not found!");
+                return;
+            }
 
-                    if (sending.getBalance() < amount) {
-                        return;
-                    }
-                    sending.setBalance(sending.getBalance() - amount);
-                    receiver.setBalance(receiver.getBalance() + convertedAmount);
-                }
+            if ("savings".equals(sender.getAccountType())) {
+                System.out.println("Cannot send money directly to a savings account.");
+                return;
+            }
+
+            if (sender.getBalance() < amount) {
+                return;
+            }
+
+            if (sender.getCurrency().equals(receiver.getCurrency())) {
+                sender.setBalance(sender.getBalance() - amount);
+                receiver.setBalance(receiver.getBalance() + amount);
+            } else {
+                double convertedAmount = CommandHelper.convertCurrency(amount, sender.getCurrency(), receiver.getCurrency(), exchangeRates);
+                sender.setBalance(sender.getBalance() - amount);
+                receiver.setBalance(receiver.getBalance() + convertedAmount);
             }
         }
     }
 }
+
