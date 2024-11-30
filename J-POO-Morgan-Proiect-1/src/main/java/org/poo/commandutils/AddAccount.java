@@ -8,16 +8,10 @@ import org.poo.utils.Utils;
 import java.util.ArrayList;
 
 public class AddAccount {
-    public static User findUserByEmail(ArrayList<User> usersList,String accountEmail){
-        for(User user : usersList){
-            if(user.getEmail().equals(accountEmail))
-                return user;
-        }
-        return null;
-    }
+
     public static void addAccount(final ArrayList<User> usersList, final CommandInput command){
         String accountEmail = command.getEmail();
-        User user = findUserByEmail(usersList, accountEmail);
+        User user = CommandHelper.findUserByEmail(usersList, accountEmail);
         if (user != null) {
             Account newAccount = new Account();
             newAccount.setTimpeStamp(command.getTimestamp());

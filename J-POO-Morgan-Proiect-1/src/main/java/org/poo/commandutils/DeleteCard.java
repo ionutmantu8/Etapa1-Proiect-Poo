@@ -11,7 +11,7 @@ public class DeleteCard {
     public static void deleteCard(ArrayList<User> users, CommandInput command) {
         String email = command.getEmail();
         String cardNumber = command.getCardNumber();
-        User user = AddAccount.findUserByEmail(users, email);
+        User user = CommandHelper.findUserByEmail(users, email);
         if (user != null) {
             for (Account account : user.getAccounts()) {
                 Card cardToRemove = null;

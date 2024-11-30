@@ -15,9 +15,9 @@ public class CreateOneTimeCard {
     public static void createOneTimeCard(ArrayList<User> users, CommandInput command){
         String IBAN = command.getAccount();
         String email = command.getEmail();
-        User user = AddAccount.findUserByEmail(users, email);
+        User user = CommandHelper.findUserByEmail(users, email);
         if(user != null) {
-            Account account = CreateCard.findAccountByIban(user, IBAN);
+            Account account = CommandHelper.findAccountByIban(user, IBAN);
             if(account != null){
                 Card newCard = new Card();
                 newCard.setOneTime(true);

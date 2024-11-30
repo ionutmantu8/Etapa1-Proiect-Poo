@@ -15,7 +15,7 @@ public class DeleteAccount {
         String email = command.getEmail();
         String accountIBAN = command.getAccount();
         boolean accountDeleted = false;
-        User user = AddAccount.findUserByEmail(users, email);
+        User user = CommandHelper.findUserByEmail(users, email);
         if (user != null) {
             Account accountToRemove = null;
             for (Account account : user.getAccounts()) {

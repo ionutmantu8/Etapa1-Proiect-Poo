@@ -58,6 +58,7 @@ public class Bank {
                 case "createOneTimeCard" -> CreateOneTimeCard.createOneTimeCard(usersList, commandInput);
                 case "deleteCard" -> DeleteCard.deleteCard(usersList, commandInput);
                 case "payOnline" -> PayOnline.payOnline(usersList, commandInput, exchangeRates, node, output,mapper);
+                case "sendMoney" -> SendMoney.sendMoney(usersList, commandInput, exchangeRates);
             }
         }
 
