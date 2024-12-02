@@ -1,5 +1,6 @@
 package org.poo.commandutils;
 
+import org.poo.banking.Transcation;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.Account;
 import org.poo.userutils.Card;
@@ -23,8 +24,17 @@ public class DeleteCard {
                 }
                 if (cardToRemove != null) {
                     account.getCards().remove(cardToRemove);
+                    Transcation transcation = new Transcation();
+                    transcation.setTimestamp(command.getTimestamp());
+                    transcation.setDescription("The card has been destroyed");
+                    transcation.setCard(cardNumber);
+                    transcation.setCardHolder(user.getEmail());
+                    transcation.setAccount(account.getIBAN());
+                    user.getTranscations().add(transcation);
                     break;
                 }
+
+
             }
         }
     }

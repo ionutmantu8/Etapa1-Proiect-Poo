@@ -16,6 +16,7 @@ public class Account {
    private ArrayList<Card> cards;
    private int timpeStamp;
    private String alias;
+   private double minBalance;
    public Account(){
          cards = new ArrayList<>();
    }

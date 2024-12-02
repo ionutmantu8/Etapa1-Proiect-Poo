@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.banking.ExchangeRate;
+import org.poo.banking.Transcation;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.Account;
 import org.poo.userutils.Card;
@@ -44,7 +45,19 @@ public class PayOnline {
                         double amountInAccountCurrency = CommandHelper.convertCurrency(amount, currency, account.getCurrency(), exchangeRates);
                         if (account.getBalance() >= amountInAccountCurrency) {
                             account.setBalance(account.getBalance() - amountInAccountCurrency);
+                            Transcation transcation = new Transcation();
+                            transcation.setTimestamp(command.getTimestamp());
+                            transcation.setDescription("Card payment");
+                            transcation.setAmountNotStr(amountInAccountCurrency);
+                            transcation.setCommeriant(command.getCommerciant());
+                            user.getTranscations().add(transcation);
                             return;
+                        } else {
+                            Transcation transcation = new Transcation();
+                            transcation.setTimestamp(command.getTimestamp());
+                            transcation.setDescription("Insufficient funds");
+                            user.getTranscations().add(transcation);
+
                         }
                     }
                 }

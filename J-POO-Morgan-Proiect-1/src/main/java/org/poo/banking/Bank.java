@@ -61,6 +61,8 @@ public class Bank {
                 case "sendMoney" -> SendMoney.sendMoney(usersList, commandInput, exchangeRates);
                 case "setAlias" -> SetAlias.setAlias(usersList, commandInput);
                 case "printTransactions" -> PrintTransactions.printTransactions(usersList, commandInput, mapper, node, output);
+
+
             }
         }
 

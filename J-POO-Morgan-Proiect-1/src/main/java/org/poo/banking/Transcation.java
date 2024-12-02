@@ -13,4 +13,9 @@ public class Transcation {
     private String receiverIBAN;
     private String amount;
     private String transferType;
+    private String card;
+    private String cardHolder;
+    private String account;
+    private String commeriant;
+    private double amountNotStr;
 }
