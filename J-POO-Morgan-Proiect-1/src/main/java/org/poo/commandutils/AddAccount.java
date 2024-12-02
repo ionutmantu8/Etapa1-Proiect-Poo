@@ -1,5 +1,6 @@
 package org.poo.commandutils;
 
+import org.poo.banking.Transcation;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.Account;
 import org.poo.userutils.User;
@@ -20,6 +21,11 @@ public class AddAccount {
             newAccount.setBalance(0);
             newAccount.setIBAN(Utils.generateIBAN());
             user.getAccounts().add(newAccount);
+            Transcation transcation = new Transcation();
+            transcation.setTimestamp(command.getTimestamp());
+            transcation.setDescription("New account created");
+            user.getTranscations().add(transcation);
+
         }
 
 

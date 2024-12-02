@@ -1,6 +1,7 @@
 package org.poo.commandutils;
 
 import org.poo.banking.ExchangeRate;
+import org.poo.banking.Transcation;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.Account;
 import org.poo.userutils.User;
@@ -18,21 +19,18 @@ public class SendMoney {
         User senderUser = CommandHelper.findUserByEmail(users, email);
 
         if (senderUser != null) {
-            Account sender = CommandHelper.findAccountByIBANOrAlias(users, senderIdentifier);
+            Account sender = CommandHelper.findAccountByIBANWithoutEmail(users, senderIdentifier);
             Account receiver = CommandHelper.findAccountByIBANOrAlias(users, receiverIdentifier);
 
             if (sender == null) {
-                System.out.println("Sender account not found!");
                 return;
             }
 
             if (receiver == null) {
-                System.out.println("Receiver account not found!");
                 return;
             }
 
             if ("savings".equals(sender.getAccountType())) {
-                System.out.println("Cannot send money directly to a savings account.");
                 return;
             }
 
@@ -48,6 +46,16 @@ public class SendMoney {
                 sender.setBalance(sender.getBalance() - amount);
                 receiver.setBalance(receiver.getBalance() + convertedAmount);
             }
+            Transcation transcation = new Transcation();
+            transcation.setTimestamp(command.getTimestamp());
+            transcation.setDescription(command.getDescription());
+            transcation.setSenderIBAN(sender.getIBAN());
+            transcation.setReceiverIBAN(receiver.getIBAN());
+            String formattedAmount = String.format("%.1f %s", command.getAmount(), sender.getCurrency());
+            transcation.setAmount(formattedAmount);
+            transcation.setTransferType("sent");
+            senderUser.getTranscations().add(transcation);
+
         }
     }
 }
