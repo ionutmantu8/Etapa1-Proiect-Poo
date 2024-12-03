@@ -20,7 +20,7 @@ public class Bank {
         UserInput[] users = inputData.getUsers();
         ArrayList<User> usersList = new ArrayList<>();
         Utils.resetRandom();
-        for(int i = 0; i < users.length; i++) {
+        for (int i = 0; i < users.length; i++) {
             usersList.add(new User());
             usersList
                     .get(i)
@@ -34,7 +34,7 @@ public class Bank {
         }
         ExchangeInput[] exchangeInputs = inputData.getExchangeRates();
         ArrayList<ExchangeRate> exchangeRates = new ArrayList<>();
-        for(int i = 0; i < exchangeInputs.length; i++){
+        for (int i = 0; i < exchangeInputs.length; i++) {
             exchangeRates.add(new ExchangeRate());
             exchangeRates
                     .get(i)
@@ -46,32 +46,61 @@ public class Bank {
                     .get(i)
                     .setRate(exchangeInputs[i].getRate());
         }
+        CommandVisitor visitor = new BankingCommandVisitor();
         CommandInput[] commandInputs = inputData.getCommands();
         for (CommandInput commandInput : commandInputs) {
             ObjectNode node = mapper.createObjectNode();
             switch (commandInput.getCommand()) {
-                case "printUsers" -> PrintUsers.printUsers(usersList, node, mapper, output, commandInput);
-                case "addAccount" -> AddAccount.addAccount(usersList, commandInput);
-                case "createCard" -> CreateCard.createCard(usersList, commandInput);
-                case "addFunds" -> AddFunds.addFunds(usersList, commandInput);
-                case "deleteAccount" -> DeleteAccount.deleteAccount(usersList, commandInput, node, output);
-                case "createOneTimeCard" -> CreateOneTimeCard.createOneTimeCard(usersList, commandInput);
-                case "deleteCard" -> DeleteCard.deleteCard(usersList, commandInput);
-                case "payOnline" -> PayOnline.payOnline(usersList, commandInput, exchangeRates, node, output,mapper);
-                case "sendMoney" -> SendMoney.sendMoney(usersList, commandInput, exchangeRates);
-                case "setAlias" -> SetAlias.setAlias(usersList, commandInput);
-                case "printTransactions" -> PrintTransactions.printTransactions(usersList, commandInput, mapper, node, output);
+                case "printUsers" -> {
+                    PrintUsers printUsersCommand = new PrintUsers(usersList, node, mapper, output, commandInput);
+                    printUsersCommand.accept(visitor);
+                }
+                case "addAccount" -> {
+                    AddAccount addAccountCommand = new AddAccount(commandInput, usersList);
+                    addAccountCommand.accept(visitor);
+                }
+                case "createCard" -> {
+                    CreateCard createCardCommand = new CreateCard(commandInput, usersList);
+                    createCardCommand.accept(visitor);
+                }
+                case "addFunds" -> {
+                    AddFunds addFundsCommand = new AddFunds(commandInput, usersList);
+                    addFundsCommand.accept(visitor);
+                }
+                case "deleteAccount" -> {
+                    DeleteAccount deleteAccountCommand = new DeleteAccount(usersList, node, mapper, output, commandInput);
+                    deleteAccountCommand.accept(visitor);
+                }
+                case "createOneTimeCard" -> {
+                    CreateOneTimeCard createOneTimeCardCommand = new CreateOneTimeCard(commandInput, usersList);
+                    createOneTimeCardCommand.accept(visitor);
+                }
+                case "deleteCard" -> {
+                    DeleteCard deleteCardCommand = new DeleteCard(commandInput, usersList);
+                    deleteCardCommand.accept(visitor);
+                }
+                case "payOnline" -> {
+                    PayOnline payOnlineCommand = new PayOnline(usersList, node, mapper, output,
+                            commandInput, exchangeRates);
+                    payOnlineCommand.accept(visitor);
+                }
+                case "sendMoney" -> {
+                    SendMoney sendMoneyCommand = new SendMoney(usersList, exchangeRates, commandInput);
+                    sendMoneyCommand.accept(visitor);
+                }
+                case "setAlias" -> {
+                    SetAlias setAliasCommand = new SetAlias(commandInput, usersList);
+                    setAliasCommand.accept(visitor);
+                }
+                case "printTransactions" -> {
+                    PrintTransactions printTransactionsCommand =
+                            new PrintTransactions(usersList, node, mapper, output, commandInput);
+                    printTransactionsCommand.accept(visitor);
+                }
 
 
             }
         }
-
-
-
-
-
-
-
 
 
         return output;

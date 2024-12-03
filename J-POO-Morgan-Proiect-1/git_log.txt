@@ -1,0 +1,71 @@
+commit f55244c91aeefa058ef0a8d5edf1258489bbfa74
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Mon Dec 2 16:42:46 2024 +0200
+
+    Passing 10 tests
+
+commit 81cbb77850ad845d43995520293fadd7a5e9ea99
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Mon Dec 2 02:53:04 2024 +0200
+
+    added printTransactions functionality
+
+commit 3db1f8b576a80ebea96aaf299a93e68848bb14b8
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Sat Nov 30 22:45:06 2024 +0200
+
+    added the setAlias function
+
+commit dc97d7318dfa8684f2d99c074a586aca37e7da77
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Sat Nov 30 21:10:22 2024 +0200
+
+    Added graph implementation for convert currency and sendMoney sistem
+
+commit 9e2fc38b41b7bf5a4ddea7df61ccc07ba57b0a6a
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Fri Nov 29 18:51:50 2024 +0200
+
+    Passing the first five tests.Conversion problem on test 5
+
+commit 9b8fd89543b7d26c06b5d882ea742ace021bcc50
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Fri Nov 29 15:41:01 2024 +0200
+
+    Added Packages for banking,command and users
+
+commit 01f206b4a8198b5a384c098181687f388461b34e
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Thu Nov 28 23:50:10 2024 +0200
+
+    try on windows
+
+commit 0a5e57a7064fc80901c35ca68c7894eb10ba2b96
+Author: ionut_gabriel.mantu <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Thu Nov 28 22:54:05 2024 +0200
+
+    Alias Fix
+
+commit a43869847dbf7ff0e5e4c0887233c641d4ab21d6
+Author: ionut_gabriel.mantu <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Thu Nov 28 22:44:35 2024 +0200
+
+    Again some tests changed
+
+commit e08962c0e284f3b2f11fbe0ed070db3a45904658
+Author: ionut_gabriel.mantu <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Wed Nov 27 20:43:28 2024 +0200
+
+    New Input and Ref
+
+commit 5392f90a76eb42b532eac631ec3bd27050632af3
+Author: ionut_gabriel.mantu <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Mon Nov 25 17:03:05 2024 +0200
+
+    Added the homework
+
+commit 4504730c9bb36d472da705784031debd99097ee5
+Author: ionutmantu8 <151817648+ionutmantu8@users.noreply.github.com>
+Date:   Mon Nov 25 16:58:34 2024 +0200
+
+    Initial commit
