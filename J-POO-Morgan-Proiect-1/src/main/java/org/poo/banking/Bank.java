@@ -14,13 +14,13 @@ import org.poo.utils.Utils;
 import java.util.ArrayList;
 
 public class Bank {
-    public final ArrayNode startBanking(ObjectInput inputData) {
+    public final ArrayNode startBanking(final ObjectInput inputData) {
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode output = mapper.createArrayNode();
         UserInput[] users = inputData.getUsers();
         ArrayList<User> usersList = new ArrayList<>();
         Utils.resetRandom();
-        for(int i = 0; i < users.length; i++) {
+        for (int i = 0; i < users.length; i++) {
             usersList.add(new User());
             usersList
                     .get(i)
@@ -34,7 +34,7 @@ public class Bank {
         }
         ExchangeInput[] exchangeInputs = inputData.getExchangeRates();
         ArrayList<ExchangeRate> exchangeRates = new ArrayList<>();
-        for(int i = 0; i < exchangeInputs.length; i++){
+        for (int i = 0; i < exchangeInputs.length; i++) {
             exchangeRates.add(new ExchangeRate());
             exchangeRates
                     .get(i)
@@ -50,28 +50,33 @@ public class Bank {
         for (CommandInput commandInput : commandInputs) {
             ObjectNode node = mapper.createObjectNode();
             switch (commandInput.getCommand()) {
-                case "printUsers" -> PrintUsers.printUsers(usersList, node, mapper, output, commandInput);
-                case "addAccount" -> AddAccount.addAccount(usersList, commandInput);
-                case "createCard" -> CreateCard.createCard(usersList, commandInput);
-                case "addFunds" -> AddFunds.addFunds(usersList, commandInput);
-                case "deleteAccount" -> DeleteAccount.deleteAccount(usersList, commandInput, node, output);
-                case "createOneTimeCard" -> CreateOneTimeCard.createOneTimeCard(usersList, commandInput);
-                case "deleteCard" -> DeleteCard.deleteCard(usersList, commandInput);
-                case "payOnline" -> PayOnline.payOnline(usersList, commandInput, exchangeRates, node, output,mapper);
-                case "sendMoney" -> SendMoney.sendMoney(usersList, commandInput, exchangeRates);
-                case "setAlias" -> SetAlias.setAlias(usersList, commandInput);
-                case "printTransactions" -> PrintTransactions.printTransactions(usersList, commandInput, mapper, node, output);
-
+                case "printUsers" -> PrintUsers
+                                    .printUsers(usersList, node, mapper, output, commandInput);
+                case "addAccount" -> AddAccount
+                                    .addAccount(usersList, commandInput);
+                case "createCard" -> CreateCard
+                                    .createCard(usersList, commandInput);
+                case "addFunds" -> AddFunds
+                                    .addFunds(usersList, commandInput);
+                case "deleteAccount" -> DeleteAccount
+                                        .deleteAccount(usersList, commandInput, node, output);
+                case "createOneTimeCard" -> CreateOneTimeCard
+                                            .createOneTimeCard(usersList, commandInput);
+                case "deleteCard" -> DeleteCard
+                                    .deleteCard(usersList, commandInput);
+                case "payOnline" -> PayOnline
+                                    .payOnline(usersList, commandInput,
+                                                exchangeRates, node, output, mapper);
+                case "sendMoney" -> SendMoney
+                                    .sendMoney(usersList, commandInput, exchangeRates);
+                case "setAlias" -> SetAlias
+                                    .setAlias(usersList, commandInput);
+                case "printTransactions" -> PrintTransactions
+                                            .printTransactions(usersList, commandInput,
+                                                                mapper, node, output);
 
             }
         }
-
-
-
-
-
-
-
 
 
         return output;

@@ -15,36 +15,35 @@ public class DeleteAccount {
         String email = command.getEmail();
         String accountIBAN = command.getAccount();
         User user = CommandHelper.findUserByEmail(users, email);
-            Account accountToRemove = null;
-            if(user == null){
-                node.put("command", command.getCommand());
-                ObjectNode outputNode = node.putObject("output");
-                outputNode.put("error", "Account couldn't be deleted - see org.poo.transactions for details");
-                outputNode.put("timestamp", command.getTimestamp());
-                node.put("timestamp", command.getTimestamp());
-                output.add(node);
-                return;
+        Account accountToRemove = null;
+        if (user == null) {
+            node.put("command", command.getCommand());
+            ObjectNode outputNode = node.putObject("output");
+            outputNode.put("error", "Account couldn't be deleted - see org.poo.transactions for details");
+            outputNode.put("timestamp", command.getTimestamp());
+            node.put("timestamp", command.getTimestamp());
+            output.add(node);
+            return;
+        }
+
+        for (Account account : user.getAccounts()) {
+            if (account.getIBAN().equals(accountIBAN)) {
+                accountToRemove = account;
+                break;
             }
 
-            for (Account account : user.getAccounts()) {
-                if (account.getIBAN().equals(accountIBAN)) {
-                    accountToRemove = account;
-                    break;
-                }
+        }
+        if (accountToRemove != null && accountToRemove.getBalance() != 0) {
+            node.put("command", command.getCommand());
+            ObjectNode outputNode = node.putObject("output");
+            outputNode.put("error", "Account couldn't be deleted - see org.poo.transactions for details");
+            outputNode.put("timestamp", command.getTimestamp());
+            node.put("timestamp", command.getTimestamp());
+            output.add(node);
+            return;
+        }
 
-            }
-                if(accountToRemove != null && accountToRemove.getBalance() != 0){
-                    node.put("command", command.getCommand());
-                    ObjectNode outputNode = node.putObject("output");
-                    outputNode.put("error", "Account couldn't be deleted - see org.poo.transactions for details");
-                    outputNode.put("timestamp", command.getTimestamp());
-                    node.put("timestamp", command.getTimestamp());
-                    output.add(node);
-                    return;
-                }
-
-                user.getAccounts().remove(accountToRemove);
-
+        user.getAccounts().remove(accountToRemove);
 
 
         node.put("command", command.getCommand());

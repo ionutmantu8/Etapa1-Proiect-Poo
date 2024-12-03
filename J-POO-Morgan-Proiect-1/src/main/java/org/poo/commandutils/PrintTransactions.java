@@ -14,12 +14,12 @@ import java.util.Comparator;
 public class PrintTransactions {
     public static void printTransactions(final ArrayList<User> users, final CommandInput command,
                                          final ObjectMapper mapper, final ObjectNode node,
-                                         final ArrayNode output){
+                                         final ArrayNode output) {
         node.put("command", command.getCommand());
         String email = command.getEmail();
         User user = CommandHelper.findUserByEmail(users, email);
 
-        if(user != null) {
+        if (user != null) {
             ArrayList<Transcation> transactions = user.getTranscations();
             transactions.sort(Comparator.comparingInt(Transcation::getTimestamp));
 
@@ -29,19 +29,19 @@ public class PrintTransactions {
 
                 transactionNode.put("timestamp", transaction.getTimestamp());
                 transactionNode.put("description", transaction.getDescription());
-                if (transaction.getAmountNotStr() != 0){
+                if (transaction.getAmountNotStr() != 0) {
                     transactionNode.put("amount", transaction.getAmountNotStr());
                 }
                 if (transaction.getCommeriant() != null) {
                     transactionNode.put("commerciant", transaction.getCommeriant());
                 }
-                if (transaction.getCard() != null){
+                if (transaction.getCard() != null) {
                     transactionNode.put("card", transaction.getCard());
                 }
-                if (transaction.getCardHolder() != null){
+                if (transaction.getCardHolder() != null) {
                     transactionNode.put("cardHolder", transaction.getCardHolder());
                 }
-                if (transaction.getAccount() != null){
+                if (transaction.getAccount() != null) {
                     transactionNode.put("account", transaction.getAccount());
                 }
                 if (transaction.getSenderIBAN() != null) {

@@ -8,9 +8,13 @@ import org.poo.utils.Utils;
 
 import java.util.ArrayList;
 
-public class AddAccount {
+public final class AddAccount {
 
-    public static void addAccount(final ArrayList<User> usersList, final CommandInput command){
+    private AddAccount() {
+        //for coding style purposes
+    }
+
+    public static void addAccount(final ArrayList<User> usersList, final CommandInput command) {
         String accountEmail = command.getEmail();
         User user = CommandHelper.findUserByEmail(usersList, accountEmail);
         if (user != null) {
@@ -27,7 +31,6 @@ public class AddAccount {
             user.getTranscations().add(transcation);
 
         }
-
 
 
     }

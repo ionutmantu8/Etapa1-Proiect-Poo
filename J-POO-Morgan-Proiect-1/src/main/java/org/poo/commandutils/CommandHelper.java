@@ -111,17 +111,15 @@ public class CommandHelper {
     }
 
     public static Account findAccountByIBANOrAlias(ArrayList<User> users, String identifier) {
-       for(User user : users){
-           for(Account account : user.getAccounts()){
-               if(account.getIBAN().equals(identifier) ||(account.getAlias() != null && account.getAlias().equals(identifier)))
-                   return account;
-           }
-       }
+        for (User user : users) {
+            for (Account account : user.getAccounts()) {
+                if (account.getIBAN().equals(identifier) || (account.getAlias() != null && account.getAlias().equals(identifier)))
+                    return account;
+            }
+        }
         return null;
 
     }
-
-
 
 
 }
