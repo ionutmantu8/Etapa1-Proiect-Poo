@@ -12,4 +12,6 @@ public interface CommandVisitor {
     void visit (SendMoney command);
     void visit (SetAlias command);
     void visit (PrintTransactions command);
+    void visit (SetMinBalance command);
+    void visit (CheckCardStatus command);
 }

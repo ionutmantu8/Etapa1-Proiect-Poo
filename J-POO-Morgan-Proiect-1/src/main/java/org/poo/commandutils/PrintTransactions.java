@@ -14,21 +14,13 @@ import java.util.Comparator;
 
 @Getter
 @Setter
-public class PrintTransactions implements Visitable {
-    private final ArrayList<User> users;
-    private final ObjectNode node;
-    private final ObjectMapper mapper;
-    private final ArrayNode output;
-    private final CommandInput command;
+public class PrintTransactions extends PrintUsers implements Visitable {
+
 
     public PrintTransactions(ArrayList<User> users, ObjectNode node,
                              ObjectMapper mapper, ArrayNode output,
                              CommandInput command) {
-        this.users = users;
-        this.node = node;
-        this.mapper = mapper;
-        this.output = output;
-        this.command = command;
+      super(users, node, mapper, output, command);
     }
 
 

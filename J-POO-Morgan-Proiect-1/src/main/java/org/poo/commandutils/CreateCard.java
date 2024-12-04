@@ -9,13 +9,10 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-public class CreateCard implements Visitable {
-    private final CommandInput commandInput;
-    private final ArrayList<User> users;
+public class CreateCard extends AddAccount implements Visitable {
 
     public CreateCard(CommandInput commandInput, ArrayList<User> users) {
-        this.commandInput = commandInput;
-        this.users = users;
+        super(commandInput, users);
     }
 
 

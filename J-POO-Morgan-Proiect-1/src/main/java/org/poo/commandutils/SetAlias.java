@@ -10,25 +10,11 @@ import org.poo.userutils.User;
 import java.util.ArrayList;
 @Getter
 @Setter
-public class SetAlias implements Visitable {
-    private final CommandInput commandInput;
-    private final ArrayList<User> users;
+public class SetAlias extends AddAccount implements Visitable {
+
 
     public SetAlias(final CommandInput commandInput, final ArrayList<User> users) {
-        this.commandInput = commandInput;
-        this.users = users;
-    }
-
-    public static void setAlias(ArrayList<User> users, CommandInput command){
-        for(User user : users){
-            for(Account account : user.getAccounts()){
-                if(account.getIBAN().equals(command.getAccount())){
-                    account.setAlias(command.getAlias());
-                    break;
-                }
-            }
-        }
-
+        super(commandInput, users);
     }
 
     @Override

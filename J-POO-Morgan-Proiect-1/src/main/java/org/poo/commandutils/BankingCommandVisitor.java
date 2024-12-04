@@ -11,6 +11,7 @@ import org.poo.userutils.Card;
 import org.poo.userutils.User;
 import org.poo.utils.Utils;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -193,10 +194,18 @@ public class BankingCommandVisitor implements CommandVisitor {
             if (account != null) {
                 Card newCard = new Card();
                 newCard.setOneTime(true);
-                newCard.setCardNumber(Utils.generateCardNumber());
+                String cardNumber = Utils.generateCardNumber();
+                newCard.setCardNumber(cardNumber);
                 newCard.setTimeStamp(commandInput.getTimestamp());
                 newCard.setActive(true);
                 account.getCards().add(newCard);
+                Transcation transcation = new Transcation();
+                transcation.setTimestamp(commandInput.getTimestamp());
+                transcation.setDescription("New card created");
+                transcation.setCard(cardNumber);
+                transcation.setCardHolder(user.getEmail());
+                transcation.setAccount(account.getIBAN());
+                user.getTranscations().add(transcation);
             }
         }
 
@@ -235,6 +244,7 @@ public class BankingCommandVisitor implements CommandVisitor {
         }
     }
 
+
     public void visit(final PayOnline command) {
         ArrayList<User> users = command.getUsers();
         ArrayList<ExchangeRate> exchangeRates = command.getExchangeRates();
@@ -246,48 +256,74 @@ public class BankingCommandVisitor implements CommandVisitor {
         double amount = commandInput.getAmount();
         String currency = commandInput.getCurrency();
         String email = commandInput.getEmail();
-        User user = CommandHelper.findUserByEmail(users, email);
 
-        if (user != null) {
-            Card card = CommandHelper.findCardByNumber(user, cardNumber);
-            if (card == null) {
-                node.put("command", commandInput.getCommand());
-                ObjectNode messageNode = mapper.createObjectNode();
-                messageNode.put("timestamp", commandInput.getTimestamp());
-                messageNode.put("description", "Card not found");
-                node.set("output", messageNode);
-                node.put("timestamp", commandInput.getTimestamp());
-                output.add(node);
-                return;
-            }
+        User user = CommandHelper.findUserByEmail(users, email);
+        if (user == null) {
+            return;
         }
 
-        if (user != null) {
-            for (Account account : user.getAccounts()) {
-                for (Card card : account.getCards()) {
-                    if (card.getCardNumber().equals(cardNumber) && card.isActive()) {
-                        double amountInAccountCurrency = CommandHelper.convertCurrency(amount, currency, account.getCurrency(), exchangeRates);
-                        if (account.getBalance() >= amountInAccountCurrency) {
-                            account.setBalance(account.getBalance() - amountInAccountCurrency);
-                            Transcation transcation = new Transcation();
-                            transcation.setTimestamp(commandInput.getTimestamp());
-                            transcation.setDescription("Card payment");
-                            transcation.setAmountNotStr(amountInAccountCurrency);
-                            transcation.setCommeriant(commandInput.getCommerciant());
-                            user.getTranscations().add(transcation);
-                            return;
-                        } else {
-                            Transcation transcation = new Transcation();
-                            transcation.setTimestamp(commandInput.getTimestamp());
-                            transcation.setDescription("Insufficient funds");
-                            user.getTranscations().add(transcation);
+        Card card = CommandHelper.findCardByNumber(user, cardNumber);
+        if (card == null) {
+            node.put("command", commandInput.getCommand());
+            ObjectNode messageNode = mapper.createObjectNode();
+            messageNode.put("timestamp", commandInput.getTimestamp());
+            messageNode.put("description", "Card not found");
+            node.set("output", messageNode);
+            node.put("timestamp", commandInput.getTimestamp());
+            output.add(node);
+            return;
+        }
 
-                        }
+        for (Account account : user.getAccounts()) {
+            for (Card card2 : account.getCards()) {
+                if (card2.getCardNumber().equals(cardNumber)) {
+
+                    if (!card2.isActive()) {
+                        Transcation transcation = new Transcation();
+                        transcation.setTimestamp(commandInput.getTimestamp());
+                        transcation.setDescription("The card is frozen");
+                        user.getTranscations().add(transcation);
+                        return;
                     }
+
+                    if (account.getBalance() < account.getMinBalance()) {
+                        card2.setActive(false);
+                        Transcation transcation = new Transcation();
+                        transcation.setTimestamp(commandInput.getTimestamp());
+                        transcation.setDescription("The card is frozen");
+                        user.getTranscations().add(transcation);
+                        return;
+                    }
+                    double amountInAccountCurrency = CommandHelper.convertCurrency(amount, currency, account.getCurrency(), exchangeRates);
+                    if (account.getBalance() >= amountInAccountCurrency &&
+                            account.getBalance() - amountInAccountCurrency >= account.getMinBalance()) {
+                        account.setBalance(account.getBalance() - amountInAccountCurrency);
+                        Transcation transcation = new Transcation();
+                        transcation.setTimestamp(commandInput.getTimestamp());
+                        transcation.setDescription("Card payment");
+                        transcation.setAmountNotStr(amountInAccountCurrency);
+                        transcation.setCommeriant(commandInput.getCommerciant());
+                        user.getTranscations().add(transcation);
+                        return;
+                    } else if (account.getBalance() < amountInAccountCurrency) {
+                        Transcation transcation = new Transcation();
+                        transcation.setTimestamp(commandInput.getTimestamp());
+                        transcation.setDescription("Insufficient funds");
+                        user.getTranscations().add(transcation);
+                    } else {
+                        card2.setActive(false);
+                        Transcation transcation = new Transcation();
+                        transcation.setTimestamp(commandInput.getTimestamp());
+                        transcation.setDescription("The card is frozen");
+                        user.getTranscations().add(transcation);
+                    }
+
+
                 }
             }
         }
     }
+
 
     public void visit(final SendMoney command) {
         CommandInput commandInput = command.getCommand();
@@ -318,6 +354,10 @@ public class BankingCommandVisitor implements CommandVisitor {
             }
 
             if (sender.getBalance() < amount) {
+                Transcation transcation = new Transcation();
+                transcation.setTimestamp(commandInput.getTimestamp());
+                transcation.setDescription("Insufficient funds");
+                senderUser.getTranscations().add(transcation);
                 return;
             }
 
@@ -412,6 +452,54 @@ public class BankingCommandVisitor implements CommandVisitor {
 
             output.add(node);
         }
+    }
+
+    public void visit(final SetMinBalance command) {
+        CommandInput commandInput = command.getCommandInput();
+        ArrayList<User> users = command.getUsers();
+        Account account = CommandHelper.findAccountByIBANWithoutEmail(users, commandInput.getAccount());
+        if (account == null) {
+            return;
+        }
+        account.setMinBalance(commandInput.getAmount());
+
+    }
+
+    public void visit(CheckCardStatus commnad) {
+        CommandInput commandInput = commnad.getCommand();
+        ObjectNode node = commnad.getNode();
+        ArrayNode output = commnad.getOutput();
+        ObjectMapper mapper = commnad.getMapper();
+        ArrayList<User> users = commnad.getUsers();
+        Account account = CommandHelper.findAccountByCardNumberWithoutEmail(users, commandInput.getCardNumber());
+        User user = CommandHelper.findUserByCardNumberWithoutEmail(users, commandInput.getCardNumber());
+
+        Card card = CommandHelper.findCardByNumberWithoutEmail(users, commandInput.getCardNumber());
+        if (card == null) {
+            node.put("command", commandInput.getCommand());
+            ObjectNode messageNode = mapper.createObjectNode();
+            messageNode.put("timestamp", commandInput.getTimestamp());
+            messageNode.put("description", "Card not found");
+            node.set("output", messageNode);
+            node.put("timestamp", commandInput.getTimestamp());
+            output.add(node);
+            return;
+        }
+        if (user == null) {
+            return;
+        }
+        if (account == null) {
+            return;
+        }
+
+        if (account.getBalance() == account.getMinBalance() && account.getBalance() == 0 && account.getMinBalance() == 0) {
+            Transcation transcation = new Transcation();
+            transcation.setTimestamp(commandInput.getTimestamp());
+            transcation.setDescription("You have reached the minimum amount of funds, the card will be frozen");
+            user.getTranscations().add(transcation);
+        }
+
+
     }
 
 }

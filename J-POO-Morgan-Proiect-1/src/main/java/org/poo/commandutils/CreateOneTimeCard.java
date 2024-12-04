@@ -12,13 +12,9 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-public class CreateOneTimeCard implements Visitable {
-    private final CommandInput commandInput;
-    private final ArrayList<User> users;
-
+public class CreateOneTimeCard extends AddAccount implements Visitable {
     public CreateOneTimeCard(CommandInput commandInput, ArrayList<User> users) {
-        this.commandInput = commandInput;
-        this.users = users;
+       super(commandInput, users);
     }
 
 

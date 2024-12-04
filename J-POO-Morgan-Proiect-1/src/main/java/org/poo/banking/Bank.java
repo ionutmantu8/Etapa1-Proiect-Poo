@@ -97,6 +97,14 @@ public class Bank {
                             new PrintTransactions(usersList, node, mapper, output, commandInput);
                     printTransactionsCommand.accept(visitor);
                 }
+                case "setMinimumBalance" -> {
+                    SetMinBalance setMinBalanceCommand = new SetMinBalance(commandInput, usersList);
+                    setMinBalanceCommand.accept(visitor);
+                }
+                case "checkCardStatus" -> {
+                    CheckCardStatus checkCardStatus = new CheckCardStatus(usersList, node ,mapper, output, commandInput);
+                    checkCardStatus.accept(visitor);
+                }
 
 
             }

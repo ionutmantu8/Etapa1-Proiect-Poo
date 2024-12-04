@@ -110,7 +110,7 @@ public class CommandHelper {
 
     }
 
-    public static Account findAccountByIBANOrAlias(ArrayList<User> users, String identifier) {
+    public static Account findAccountByIBANOrAlias(final ArrayList<User> users, final String identifier) {
        for(User user : users){
            for(Account account : user.getAccounts()){
                if(account.getIBAN().equals(identifier) ||(account.getAlias() != null && account.getAlias().equals(identifier)))
@@ -120,6 +120,44 @@ public class CommandHelper {
         return null;
 
     }
+    public static Card findCardByNumberWithoutEmail (final ArrayList<User> users, final String cardNumber) {
+        for(User user : users){
+            for(Account account : user.getAccounts()){
+                for(Card card : account.getCards()){
+                    if(card.getCardNumber().equals(cardNumber)){
+                        return card;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    public static Account findAccountByCardNumberWithoutEmail (final ArrayList<User> users, final String cardNumber) {
+        for(User user : users){
+            for(Account account : user.getAccounts()){
+                for(Card card : account.getCards()){
+                    if(card.getCardNumber().equals(cardNumber)){
+                        return account;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static User findUserByCardNumberWithoutEmail (final ArrayList<User> users, final String cardNumber) {
+        for(User user : users){
+            for(Account account : user.getAccounts()){
+                for(Card card : account.getCards()){
+                    if(card.getCardNumber().equals(cardNumber)){
+                        return user;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
 
 
