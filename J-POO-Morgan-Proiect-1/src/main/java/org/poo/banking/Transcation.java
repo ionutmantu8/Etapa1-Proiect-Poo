@@ -4,6 +4,8 @@ package org.poo.banking;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class Transcation {
@@ -18,4 +20,7 @@ public class Transcation {
     private String account;
     private String commeriant;
     private double amountNotStr;
+    private String currency;
+    private String ammount;
+    private List<String> involvedAccounts;
 }

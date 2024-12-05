@@ -9,12 +9,18 @@ import org.poo.userutils.User;
 import java.util.ArrayList;
 
 public class CheckCardStatus extends PrintUsers implements Visitable {
-    public CheckCardStatus(ArrayList<User> users, ObjectNode node, ObjectMapper mapper, ArrayNode output, CommandInput command) {
+    public CheckCardStatus(final ArrayList<User> users, final ObjectNode node,
+                           final ObjectMapper mapper, final ArrayNode output,
+                           final CommandInput command) {
         super(users, node, mapper, output, command);
     }
 
+    /**
+     * Accept method for the visitor pattern.
+     * @param visitor the visitor
+     */
     @Override
-    public void accept(CommandVisitor visitor) {
+    public void accept(final CommandVisitor visitor) {
         visitor.visit(this);
     }
 

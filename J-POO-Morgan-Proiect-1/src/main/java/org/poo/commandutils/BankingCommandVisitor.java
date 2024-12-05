@@ -11,12 +11,14 @@ import org.poo.userutils.Card;
 import org.poo.userutils.User;
 import org.poo.utils.Utils;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class BankingCommandVisitor implements CommandVisitor {
-
+    /**
+     *
+     */
     @Override
     public void visit(final AddAccount command) {
         CommandInput commandInput = command.getCommandInput();
@@ -30,6 +32,7 @@ public class BankingCommandVisitor implements CommandVisitor {
             newAccount.setCurrency(commandInput.getCurrency());
             newAccount.setBalance(0);
             newAccount.setIBAN(Utils.generateIBAN());
+            newAccount.setInterestRate(commandInput.getInterestRate());
             user.getAccounts().add(newAccount);
             Transcation transcation = new Transcation();
             transcation.setTimestamp(commandInput.getTimestamp());
@@ -37,7 +40,9 @@ public class BankingCommandVisitor implements CommandVisitor {
             user.getTranscations().add(transcation);
         }
     }
-
+    /**
+     *
+     */
     @Override
     public void visit(final AddFunds command) {
         ArrayList<User> users = command.getUsers();
@@ -54,7 +59,9 @@ public class BankingCommandVisitor implements CommandVisitor {
         }
 
     }
-
+    /**
+     *
+     */
     @Override
     public void visit(final CreateCard command) {
         CommandInput commandInput = command.getCommandInput();
@@ -82,7 +89,9 @@ public class BankingCommandVisitor implements CommandVisitor {
             }
         }
     }
-
+    /**
+     *
+     */
     @Override
     public void visit(final PrintUsers command) {
         ObjectNode node = command.getNode();
@@ -127,7 +136,9 @@ public class BankingCommandVisitor implements CommandVisitor {
 
         output.add(node);
     }
-
+    /**
+     *
+     */
     @Override
     public void visit(final DeleteAccount command) {
         CommandInput commandInput = command.getCommand();
@@ -142,7 +153,9 @@ public class BankingCommandVisitor implements CommandVisitor {
         if (user == null) {
             node.put("command", commandInput.getCommand());
             ObjectNode outputNode = node.putObject("output");
-            outputNode.put("error", "Account couldn't be deleted - see org.poo.transactions for details");
+            outputNode
+                    .put("error",
+                            "Account couldn't be deleted - see org.poo.transactions for details");
             outputNode.put("timestamp", commandInput.getTimestamp());
             node.put("timestamp", commandInput.getTimestamp());
             output.add(node);
@@ -159,7 +172,8 @@ public class BankingCommandVisitor implements CommandVisitor {
         if (accountToRemove != null && accountToRemove.getBalance() != 0) {
             node.put("command", commandInput.getCommand());
             ObjectNode outputNode = node.putObject("output");
-            outputNode.put("error", "Account couldn't be deleted - see org.poo.transactions for details");
+            outputNode.put("error",
+                    "Account couldn't be deleted - see org.poo.transactions for details");
             outputNode.put("timestamp", commandInput.getTimestamp());
             node.put("timestamp", commandInput.getTimestamp());
             output.add(node);
@@ -174,14 +188,17 @@ public class BankingCommandVisitor implements CommandVisitor {
         if (accountToRemove != null) {
             outputNode.put("success", "Account deleted");
         } else {
-            outputNode.put("error", "Account couldn't be deleted - see org.poo.transactions for details");
+            outputNode.put("error",
+                    "Account couldn't be deleted - see org.poo.transactions for details");
         }
         outputNode.put("timestamp", commandInput.getTimestamp());
         node.put("timestamp", commandInput.getTimestamp());
 
         output.add(node);
     }
-
+    /**
+     *
+     */
     @Override
     public void visit(final CreateOneTimeCard command) {
         ArrayList<User> users = command.getUsers();
@@ -210,7 +227,9 @@ public class BankingCommandVisitor implements CommandVisitor {
         }
 
     }
-
+    /**
+     *
+     */
     @Override
     public void visit(final DeleteCard command) {
         CommandInput commandInput = command.getCommandInput();
@@ -244,7 +263,9 @@ public class BankingCommandVisitor implements CommandVisitor {
         }
     }
 
-
+    /**
+     *
+     */
     public void visit(final PayOnline command) {
         ArrayList<User> users = command.getUsers();
         ArrayList<ExchangeRate> exchangeRates = command.getExchangeRates();
@@ -294,9 +315,12 @@ public class BankingCommandVisitor implements CommandVisitor {
                         user.getTranscations().add(transcation);
                         return;
                     }
-                    double amountInAccountCurrency = CommandHelper.convertCurrency(amount, currency, account.getCurrency(), exchangeRates);
-                    if (account.getBalance() >= amountInAccountCurrency &&
-                            account.getBalance() - amountInAccountCurrency >= account.getMinBalance()) {
+                    double amountInAccountCurrency = CommandHelper
+                                                    .convertCurrency(amount, currency,
+                                                            account.getCurrency(), exchangeRates);
+                    if (account.getBalance() >= amountInAccountCurrency
+                            && account.getBalance() - amountInAccountCurrency
+                            >= account.getMinBalance()) {
                         account.setBalance(account.getBalance() - amountInAccountCurrency);
                         Transcation transcation = new Transcation();
                         transcation.setTimestamp(commandInput.getTimestamp());
@@ -324,7 +348,9 @@ public class BankingCommandVisitor implements CommandVisitor {
         }
     }
 
-
+    /**
+     *
+     */
     public void visit(final SendMoney command) {
         CommandInput commandInput = command.getCommand();
         ArrayList<User> users = command.getUsers();
@@ -365,7 +391,10 @@ public class BankingCommandVisitor implements CommandVisitor {
                 sender.setBalance(sender.getBalance() - amount);
                 receiver.setBalance(receiver.getBalance() + amount);
             } else {
-                double convertedAmount = CommandHelper.convertCurrency(amount, sender.getCurrency(), receiver.getCurrency(), exchangeRates);
+                double convertedAmount =
+                        CommandHelper
+                                .convertCurrency(amount, sender.getCurrency(),
+                                        receiver.getCurrency(), exchangeRates);
                 sender.setBalance(sender.getBalance() - amount);
                 receiver.setBalance(receiver.getBalance() + convertedAmount);
             }
@@ -374,14 +403,17 @@ public class BankingCommandVisitor implements CommandVisitor {
             transcation.setDescription(commandInput.getDescription());
             transcation.setSenderIBAN(sender.getIBAN());
             transcation.setReceiverIBAN(receiver.getIBAN());
-            String formattedAmount = String.format("%.1f %s", commandInput.getAmount(), sender.getCurrency());
+            String formattedAmount = String
+                    .format("%.1f %s", commandInput.getAmount(), sender.getCurrency());
             transcation.setAmount(formattedAmount);
             transcation.setTransferType("sent");
             senderUser.getTranscations().add(transcation);
 
         }
     }
-
+    /**
+     *
+     */
     public void visit(final SetAlias command) {
         ArrayList<User> users = command.getUsers();
         CommandInput commandInput = command.getCommandInput();
@@ -391,11 +423,14 @@ public class BankingCommandVisitor implements CommandVisitor {
         User user = CommandHelper.findUserByEmail(users, email);
         if (user != null) {
             Account account = CommandHelper.findAccountByIban(user, IBAN);
-            if (account != null)
+            if (account != null) {
                 account.setAlias(alias);
+            }
         }
     }
-
+    /**
+     *
+     */
     public void visit(final PrintTransactions command) {
         ArrayList<User> users = command.getUsers();
         ObjectMapper mapper = command.getMapper();
@@ -416,6 +451,9 @@ public class BankingCommandVisitor implements CommandVisitor {
 
                 transactionNode.put("timestamp", transaction.getTimestamp());
                 transactionNode.put("description", transaction.getDescription());
+                if (transaction.getCurrency() != null) {
+                    transactionNode.put("currency", transaction.getCurrency());
+                }
                 if (transaction.getAmountNotStr() != 0) {
                     transactionNode.put("amount", transaction.getAmountNotStr());
                 }
@@ -443,6 +481,13 @@ public class BankingCommandVisitor implements CommandVisitor {
                 if (transaction.getTransferType() != null) {
                     transactionNode.put("transferType", transaction.getTransferType());
                 }
+                if (transaction.getInvolvedAccounts() != null) {
+                    ArrayNode involvedAccountsArray = transactionNode.putArray("involvedAccounts");
+                    for (String account : transaction.getInvolvedAccounts()) {
+                        involvedAccountsArray.add(account);
+                    }
+                }
+
 
                 transactionsArray.add(transactionNode);
             }
@@ -453,28 +498,36 @@ public class BankingCommandVisitor implements CommandVisitor {
             output.add(node);
         }
     }
-
+    /**
+     *
+     */
     public void visit(final SetMinBalance command) {
         CommandInput commandInput = command.getCommandInput();
         ArrayList<User> users = command.getUsers();
-        Account account = CommandHelper.findAccountByIBANWithoutEmail(users, commandInput.getAccount());
+        Account account = CommandHelper
+                .findAccountByIBANWithoutEmail(users, commandInput.getAccount());
         if (account == null) {
             return;
         }
         account.setMinBalance(commandInput.getAmount());
 
     }
-
-    public void visit(CheckCardStatus commnad) {
+    /**
+     *
+     */
+    public void visit(final CheckCardStatus commnad) {
         CommandInput commandInput = commnad.getCommand();
         ObjectNode node = commnad.getNode();
         ArrayNode output = commnad.getOutput();
         ObjectMapper mapper = commnad.getMapper();
         ArrayList<User> users = commnad.getUsers();
-        Account account = CommandHelper.findAccountByCardNumberWithoutEmail(users, commandInput.getCardNumber());
-        User user = CommandHelper.findUserByCardNumberWithoutEmail(users, commandInput.getCardNumber());
+        Account account = CommandHelper
+                        .findAccountByCardNumberWithoutEmail(users, commandInput.getCardNumber());
+        User user = CommandHelper
+                    .findUserByCardNumberWithoutEmail(users, commandInput.getCardNumber());
 
-        Card card = CommandHelper.findCardByNumberWithoutEmail(users, commandInput.getCardNumber());
+        Card card = CommandHelper
+                    .findCardByNumberWithoutEmail(users, commandInput.getCardNumber());
         if (card == null) {
             node.put("command", commandInput.getCommand());
             ObjectNode messageNode = mapper.createObjectNode();
@@ -492,16 +545,102 @@ public class BankingCommandVisitor implements CommandVisitor {
             return;
         }
 
-        if (account.getBalance() == account.getMinBalance() && account.getBalance() == 0 && account.getMinBalance() == 0) {
+        if (account.getBalance() == account.getMinBalance()
+                && account.getBalance() == 0
+                && account.getMinBalance() == 0) {
+            String mess = "You have reached the minimum amount of funds, the card will be frozen";
             Transcation transcation = new Transcation();
             transcation.setTimestamp(commandInput.getTimestamp());
-            transcation.setDescription("You have reached the minimum amount of funds, the card will be frozen");
+            transcation.setDescription(mess);
             user.getTranscations().add(transcation);
         }
 
 
     }
+    /**
+     *
+     */
+    public void visit(final ChangeInterestRate command) {
+        CommandInput commandInput = command.getCommandInput();
+        ArrayList<User> users = command.getUsers();
+        Account account = CommandHelper
+                        .findAccountByIBANWithoutEmail(users, commandInput.getAccount());
+        if (account == null) {
+            return;
+        }
+        account.setInterestRate(commandInput.getInterestRate());
+    }
+    /**
+     *
+     */
+    public void visit(final SplitPayment command) {
+        CommandInput commandInput = command.getCommand();
+        ArrayList<User> users = command.getUsers();
+        ArrayList<ExchangeRate> exchangeRates = command.getExchangeRates();
+        List<String> accountIdentifiers = commandInput.getAccounts();
+        double totalAmount = commandInput.getAmount();
+        String baseCurrency = commandInput.getCurrency();
+        int timestamp = commandInput.getTimestamp();
+
+        ArrayList<Account> accounts = new ArrayList<>();
+
+        for (String accountIdentifier : accountIdentifiers) {
+            Account account = CommandHelper.findAccountByIBANWithoutEmail(users, accountIdentifier);
+            if (account == null) {
+                return;
+            }
+            accounts.add(account);
+        }
+
+        double splitAmount = totalAmount / accounts.size();
+
+        for (Account account : accounts) {
+            double amountInAccountCurrency = splitAmount;
+
+            if (!account.getCurrency().equals(baseCurrency)) {
+                amountInAccountCurrency = CommandHelper.convertCurrency(
+                        splitAmount, baseCurrency, account.getCurrency(), exchangeRates);
+            }
+
+            if (account.getBalance() < amountInAccountCurrency) {
+                return;
+            }
+        }
+
+        for (Account account : accounts) {
+            double amountInAccountCurrency = splitAmount;
+
+            if (!account.getCurrency().equals(baseCurrency)) {
+                amountInAccountCurrency = CommandHelper.convertCurrency(
+                        splitAmount, baseCurrency, account.getCurrency(), exchangeRates);
+            }
+
+            account.setBalance(account.getBalance() - amountInAccountCurrency);
+
+            Transcation transaction = new Transcation();
+            transaction.setTimestamp(timestamp);
+            transaction
+                    .setDescription("Split payment of "
+                                    + String.format("%.2f", totalAmount)
+                                    + " "
+                                    + baseCurrency);
+            transaction.setCurrency(commandInput.getCurrency());
+            transaction
+                    .setAmountNotStr(commandInput.getAmount() / commandInput.getAccounts().size());
+            transaction.setInvolvedAccounts(new ArrayList<>(accountIdentifiers));
+
+            for (User user : users) {
+                for (Account userAccount : user.getAccounts()) {
+                    if (userAccount.getIBAN().equals(account.getIBAN())) {
+                        user.getTranscations().add(transaction);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
 }
+
 
 

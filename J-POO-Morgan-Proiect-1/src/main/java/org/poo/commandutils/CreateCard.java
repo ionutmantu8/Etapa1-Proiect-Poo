@@ -11,14 +11,17 @@ import java.util.ArrayList;
 @Setter
 public class CreateCard extends AddAccount implements Visitable {
 
-    public CreateCard(CommandInput commandInput, ArrayList<User> users) {
+    public CreateCard(final CommandInput commandInput, final ArrayList<User> users) {
         super(commandInput, users);
     }
 
 
-
+    /**
+     * Accept method for the visitor pattern.
+     * @param visitor the visitor
+     */
     @Override
-    public void accept(CommandVisitor visitor) {
+    public void accept(final CommandVisitor visitor) {
         visitor.visit(this);
     }
 }

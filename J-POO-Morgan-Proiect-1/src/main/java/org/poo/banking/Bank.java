@@ -13,8 +13,13 @@ import org.poo.utils.Utils;
 
 import java.util.ArrayList;
 
+
+
 public class Bank {
-    public final ArrayNode startBanking(ObjectInput inputData) {
+    /**
+     * Class that represents the bank.
+     */
+    public final ArrayNode startBanking(final ObjectInput inputData) {
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode output = mapper.createArrayNode();
         UserInput[] users = inputData.getUsers();
@@ -52,7 +57,8 @@ public class Bank {
             ObjectNode node = mapper.createObjectNode();
             switch (commandInput.getCommand()) {
                 case "printUsers" -> {
-                    PrintUsers printUsersCommand = new PrintUsers(usersList, node, mapper, output, commandInput);
+                    PrintUsers printUsersCommand =
+                            new PrintUsers(usersList, node, mapper, output, commandInput);
                     printUsersCommand.accept(visitor);
                 }
                 case "addAccount" -> {
@@ -68,11 +74,13 @@ public class Bank {
                     addFundsCommand.accept(visitor);
                 }
                 case "deleteAccount" -> {
-                    DeleteAccount deleteAccountCommand = new DeleteAccount(usersList, node, mapper, output, commandInput);
+                    DeleteAccount deleteAccountCommand =
+                            new DeleteAccount(usersList, node, mapper, output, commandInput);
                     deleteAccountCommand.accept(visitor);
                 }
                 case "createOneTimeCard" -> {
-                    CreateOneTimeCard createOneTimeCardCommand = new CreateOneTimeCard(commandInput, usersList);
+                    CreateOneTimeCard createOneTimeCardCommand =
+                            new CreateOneTimeCard(commandInput, usersList);
                     createOneTimeCardCommand.accept(visitor);
                 }
                 case "deleteCard" -> {
@@ -85,7 +93,8 @@ public class Bank {
                     payOnlineCommand.accept(visitor);
                 }
                 case "sendMoney" -> {
-                    SendMoney sendMoneyCommand = new SendMoney(usersList, exchangeRates, commandInput);
+                    SendMoney sendMoneyCommand =
+                            new SendMoney(usersList, exchangeRates, commandInput);
                     sendMoneyCommand.accept(visitor);
                 }
                 case "setAlias" -> {
@@ -98,12 +107,24 @@ public class Bank {
                     printTransactionsCommand.accept(visitor);
                 }
                 case "setMinimumBalance" -> {
-                    SetMinBalance setMinBalanceCommand = new SetMinBalance(commandInput, usersList);
+                    SetMinBalance setMinBalanceCommand =
+                            new SetMinBalance(commandInput, usersList);
                     setMinBalanceCommand.accept(visitor);
                 }
                 case "checkCardStatus" -> {
-                    CheckCardStatus checkCardStatus = new CheckCardStatus(usersList, node ,mapper, output, commandInput);
+                    CheckCardStatus checkCardStatus =
+                            new CheckCardStatus(usersList, node, mapper, output, commandInput);
                     checkCardStatus.accept(visitor);
+                }
+                case "changeInterestRate" -> {
+                    ChangeInterestRate changeInterestRate =
+                            new ChangeInterestRate(usersList, commandInput);
+                    changeInterestRate.accept(visitor);
+                }
+                case "splitPayment" -> {
+                    SplitPayment splitPayment =
+                            new SplitPayment(commandInput, usersList, exchangeRates);
+                    splitPayment.accept(visitor);
                 }
 
 

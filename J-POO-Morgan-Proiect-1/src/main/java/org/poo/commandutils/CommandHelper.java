@@ -7,24 +7,41 @@ import org.poo.userutils.User;
 
 import java.util.*;
 
-public class CommandHelper {
-    public static User findUserByEmail(ArrayList<User> usersList, String accountEmail) {
+public final class CommandHelper {
+    private CommandHelper() {
+        /**
+         * for coding style purposes
+         */
+    }
+    /**
+     *
+     *
+     */
+    public static User findUserByEmail(final ArrayList<User> usersList,
+                                       final String accountEmail) {
         for (User user : usersList) {
-            if (user.getEmail().equals(accountEmail))
+            if (user.getEmail().equals(accountEmail)) {
                 return user;
+            }
         }
         return null;
     }
 
-    public static Account findAccountByIban(User user, String IBAN) {
+    /**
+     *
+     */
+    public static Account findAccountByIban(final User user, final String IBAN) {
         for (Account account : user.getAccounts()) {
-            if (account.getIBAN().equals(IBAN))
+            if (account.getIBAN().equals(IBAN)) {
                 return account;
+            }
         }
         return null;
     }
-
-    public static Card findCardByNumber(User user, String cardNumber) {
+    /**
+     *
+     */
+    public static Card findCardByNumber(final User user, final String cardNumber) {
         for (Account account : user.getAccounts()) {
             for (Card card : account.getCards()) {
                 if (card.getCardNumber().equals(cardNumber)) {
@@ -36,16 +53,19 @@ public class CommandHelper {
     }
 
     public static class Pair<T, U> {
-        T currency;
-        U rate;
+        private final  T currency;
+        private final  U rate;
 
-        Pair(T currency, U rate) {
+        Pair(final T currency, final U rate) {
             this.currency = currency;
             this.rate = rate;
         }
     }
-
-    public static Map<String, Map<String, Double>> buildGraph(ArrayList<ExchangeRate> exchangeRates) {
+    /**
+     *
+     */
+    public static Map<String, Map<String, Double>> buildGraph(
+            final ArrayList<ExchangeRate> exchangeRates) {
         Map<String, Map<String, Double>> graph = new HashMap<>();
 
         for (ExchangeRate rate : exchangeRates) {
@@ -59,12 +79,16 @@ public class CommandHelper {
 
         return graph;
     }
-
-    public static double findBestRate(String from, String to, Map<String, Map<String, Double>> graph) {
-        if (from.equals(to))
+    /**
+     *
+     */
+    public static double findBestRate(final String from, final String to,
+                                      final Map<String, Map<String, Double>> graph) {
+        if (from.equals(to)) {
             return 1.0;
-
-        PriorityQueue<Pair<String, Double>> pq = new PriorityQueue<>(Comparator.comparingDouble(a -> -a.rate));
+        }
+        PriorityQueue<Pair<String, Double>> pq =
+                new PriorityQueue<>(Comparator.comparingDouble(a -> -a.rate));
         Set<String> visited = new HashSet<>();
         pq.add(new Pair<>(from, 1.0));
 
@@ -77,7 +101,9 @@ public class CommandHelper {
                 return rate;
             }
 
-            if (visited.contains(currency)) continue;
+            if (visited.contains(currency)) {
+                continue;
+            }
             visited.add(currency);
 
             if (graph.containsKey(currency)) {
@@ -91,40 +117,56 @@ public class CommandHelper {
 
         return 0.0;
     }
-
-    public static double convertCurrency(double amount, String from, String to, ArrayList<ExchangeRate> exchangeRates) {
+    /**
+     *
+     */
+    public static double convertCurrency(final double amount, final String from, final String to,
+                                         final ArrayList<ExchangeRate> exchangeRates) {
         Map<String, Map<String, Double>> graph = buildGraph(exchangeRates);
         double rate = findBestRate(from, to, graph);
         return amount * rate;
     }
-
-    public static Account findAccountByIBANWithoutEmail(ArrayList<User> users, String IBAN) {
+    /**
+     *
+     */
+    public static Account findAccountByIBANWithoutEmail(final ArrayList<User> users,
+                                                        final String IBAN) {
         for (User user : users) {
             for (Account account : user.getAccounts()) {
-                if (account.getIBAN().equals(IBAN))
+                if (account.getIBAN().equals(IBAN)) {
                     return account;
-
+                }
             }
         }
         return null;
 
     }
-
-    public static Account findAccountByIBANOrAlias(final ArrayList<User> users, final String identifier) {
-       for(User user : users){
-           for(Account account : user.getAccounts()){
-               if(account.getIBAN().equals(identifier) ||(account.getAlias() != null && account.getAlias().equals(identifier)))
+    /**
+     *
+     */
+    public static Account findAccountByIBANOrAlias(final ArrayList<User> users,
+                                                   final String identifier) {
+       for (User user : users) {
+           for (Account account : user.getAccounts()) {
+               if (account.getIBAN().equals(identifier)
+                       || (account.getAlias() != null
+                       && account.getAlias().equals(identifier))) {
                    return account;
+               }
            }
        }
         return null;
 
     }
-    public static Card findCardByNumberWithoutEmail (final ArrayList<User> users, final String cardNumber) {
-        for(User user : users){
-            for(Account account : user.getAccounts()){
-                for(Card card : account.getCards()){
-                    if(card.getCardNumber().equals(cardNumber)){
+    /**
+     *
+     */
+    public static Card findCardByNumberWithoutEmail(final ArrayList<User> users,
+                                                     final String cardNumber) {
+        for (User user : users) {
+            for (Account account : user.getAccounts()) {
+                for (Card card : account.getCards()) {
+                    if (card.getCardNumber().equals(cardNumber)) {
                         return card;
                     }
                 }
@@ -132,11 +174,15 @@ public class CommandHelper {
         }
         return null;
     }
-    public static Account findAccountByCardNumberWithoutEmail (final ArrayList<User> users, final String cardNumber) {
-        for(User user : users){
-            for(Account account : user.getAccounts()){
-                for(Card card : account.getCards()){
-                    if(card.getCardNumber().equals(cardNumber)){
+    /**
+     *
+     */
+    public static Account findAccountByCardNumberWithoutEmail(final ArrayList<User> users,
+                                                               final String cardNumber) {
+        for (User user : users) {
+            for (Account account : user.getAccounts()) {
+                for (Card card : account.getCards()) {
+                    if (card.getCardNumber().equals(cardNumber)) {
                         return account;
                     }
                 }
@@ -144,12 +190,15 @@ public class CommandHelper {
         }
         return null;
     }
-
-    public static User findUserByCardNumberWithoutEmail (final ArrayList<User> users, final String cardNumber) {
-        for(User user : users){
-            for(Account account : user.getAccounts()){
-                for(Card card : account.getCards()){
-                    if(card.getCardNumber().equals(cardNumber)){
+    /**
+     *
+     */
+    public static User findUserByCardNumberWithoutEmail(final ArrayList<User> users,
+                                                         final String cardNumber) {
+        for (User user : users) {
+            for (Account account : user.getAccounts()) {
+                for (Card card : account.getCards()) {
+                    if (card.getCardNumber().equals(cardNumber)) {
                         return user;
                     }
                 }
@@ -157,9 +206,4 @@ public class CommandHelper {
         }
         return null;
     }
-
-
-
-
-
 }

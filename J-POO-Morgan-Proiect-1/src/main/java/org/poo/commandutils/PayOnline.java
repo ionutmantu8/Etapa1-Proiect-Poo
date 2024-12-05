@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.banking.ExchangeRate;
-import org.poo.banking.Transcation;
 import org.poo.fileio.CommandInput;
-import org.poo.userutils.Account;
-import org.poo.userutils.Card;
 import org.poo.userutils.User;
 
 import java.util.*;
@@ -24,9 +21,9 @@ public class PayOnline implements Visitable {
     private final CommandInput command;
     private final ArrayList<ExchangeRate> exchangeRates;
 
-    public PayOnline(ArrayList<User> users, ObjectNode node,
-                     ObjectMapper mapper, ArrayNode output,
-                     CommandInput command, ArrayList<ExchangeRate> exchangeRates) {
+    public PayOnline(final ArrayList<User> users, final ObjectNode node,
+                     final ObjectMapper mapper, final ArrayNode output,
+                     final CommandInput command, final ArrayList<ExchangeRate> exchangeRates) {
         this.users = users;
         this.node = node;
         this.mapper = mapper;
@@ -35,9 +32,12 @@ public class PayOnline implements Visitable {
         this.exchangeRates = exchangeRates;
     }
 
-
+    /**
+     * Accept method for the visitor pattern.
+     * @param visitor the visitor
+     */
     @Override
-    public void accept(CommandVisitor visitor) {
+    public void accept(final CommandVisitor visitor) {
         visitor.visit(this);
     }
 }

@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
-import org.poo.userutils.Account;
-import org.poo.userutils.Card;
 
 import java.util.ArrayList;
 
@@ -21,7 +19,9 @@ public class PrintUsers implements Visitable {
     private final ArrayNode output;
     private final CommandInput command;
 
-    public PrintUsers(ArrayList<User> users, ObjectNode node, ObjectMapper mapper, ArrayNode output, CommandInput command) {
+    public PrintUsers(final ArrayList<User> users, final ObjectNode node,
+                      final ObjectMapper mapper, final ArrayNode output,
+                      final CommandInput command) {
         this.users = users;
         this.node = node;
         this.mapper = mapper;
@@ -29,9 +29,12 @@ public class PrintUsers implements Visitable {
         this.command = command;
     }
 
-
+    /**
+     * Accept method for the visitor pattern.
+     * @param visitor the visitor
+     */
     @Override
-    public void accept(CommandVisitor visitor) {
+    public void accept(final CommandVisitor visitor) {
         visitor.visit(this);
     }
 }

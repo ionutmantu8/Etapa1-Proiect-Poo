@@ -5,27 +5,27 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.banking.Transcation;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
-
 import java.util.ArrayList;
-import java.util.Comparator;
 
 @Getter
 @Setter
 public class PrintTransactions extends PrintUsers implements Visitable {
 
 
-    public PrintTransactions(ArrayList<User> users, ObjectNode node,
-                             ObjectMapper mapper, ArrayNode output,
-                             CommandInput command) {
+    public PrintTransactions(final ArrayList<User> users, final ObjectNode node,
+                             final ObjectMapper mapper, final ArrayNode output,
+                             final CommandInput command) {
       super(users, node, mapper, output, command);
     }
 
-
+    /**
+     * Accept method for the visitor pattern.
+     * @param visitor the visitor
+     */
     @Override
-    public void accept(CommandVisitor visitor) {
+    public void accept(final CommandVisitor visitor) {
         visitor.visit(this);
     }
 }

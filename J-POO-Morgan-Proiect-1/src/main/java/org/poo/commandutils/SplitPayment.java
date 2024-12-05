@@ -1,17 +1,15 @@
 package org.poo.commandutils;
 
-import lombok.Getter;
-import lombok.Setter;
+import org.poo.banking.ExchangeRate;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 
 import java.util.ArrayList;
 
-@Getter
-@Setter
-public class SetMinBalance extends AddAccount implements Visitable {
-    public SetMinBalance(final CommandInput commandInput, final ArrayList<User> users) {
-        super(commandInput, users);
+public class SplitPayment extends SendMoney implements Visitable {
+    public SplitPayment(final  CommandInput commandInput, final ArrayList<User> usersList,
+                        final ArrayList<ExchangeRate> exchangeRates) {
+        super(usersList, exchangeRates, commandInput);
     }
     /**
      * Accept method for the visitor pattern.
@@ -21,6 +19,4 @@ public class SetMinBalance extends AddAccount implements Visitable {
     public void accept(final CommandVisitor visitor) {
         visitor.visit(this);
     }
-
-
 }

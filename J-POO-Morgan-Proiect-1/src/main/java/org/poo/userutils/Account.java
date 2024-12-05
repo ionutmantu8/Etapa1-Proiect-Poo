@@ -1,6 +1,5 @@
 package org.poo.userutils;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +16,8 @@ public class Account {
    private int timpeStamp;
    private String alias;
    private double minBalance;
-   public Account(){
+   private double interestRate;
+   public Account() {
          cards = new ArrayList<>();
    }
 }

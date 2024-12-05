@@ -1,10 +1,8 @@
 package org.poo.commandutils;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.fileio.CommandInput;
-import org.poo.userutils.Account;
 import org.poo.userutils.User;
 
 import java.util.ArrayList;
@@ -17,8 +15,12 @@ public class SetAlias extends AddAccount implements Visitable {
         super(commandInput, users);
     }
 
+    /**
+     * Accept method for the visitor pattern.
+     * @param visitor the visitor
+     */
     @Override
-    public void accept(CommandVisitor visitor) {
+    public void accept(final CommandVisitor visitor) {
         visitor.visit(this);
     }
 
