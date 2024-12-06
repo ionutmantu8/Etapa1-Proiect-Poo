@@ -118,7 +118,7 @@ public class Bank {
                 }
                 case "changeInterestRate" -> {
                     ChangeInterestRate changeInterestRate =
-                            new ChangeInterestRate(usersList, commandInput);
+                            new ChangeInterestRate(usersList, commandInput, mapper, node, output);
                     changeInterestRate.accept(visitor);
                 }
                 case "splitPayment" -> {
@@ -126,7 +126,19 @@ public class Bank {
                             new SplitPayment(commandInput, usersList, exchangeRates);
                     splitPayment.accept(visitor);
                 }
-
+                case "report" -> {
+                    Report report = new Report(usersList, mapper, output, node, commandInput);
+                    report.accept(visitor);
+                }
+                case "spendingsReport" -> {
+                    SpendingsReport spendingsReport =
+                            new SpendingsReport(usersList, commandInput, node, mapper, output);
+                    spendingsReport.accept(visitor);
+                }
+                case "addInterest" -> {
+                    AddInterest addInterest = new AddInterest(usersList, commandInput, node, mapper, output);
+                    addInterest.accept(visitor);
+                }
 
             }
         }

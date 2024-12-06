@@ -3,6 +3,7 @@ package org.poo.commandutils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.poo.banking.Commerciants;
 import org.poo.banking.ExchangeRate;
 import org.poo.banking.Transcation;
 import org.poo.fileio.CommandInput;
@@ -11,9 +12,7 @@ import org.poo.userutils.Card;
 import org.poo.userutils.User;
 import org.poo.utils.Utils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class BankingCommandVisitor implements CommandVisitor {
     /**
@@ -177,6 +176,10 @@ public class BankingCommandVisitor implements CommandVisitor {
             outputNode.put("timestamp", commandInput.getTimestamp());
             node.put("timestamp", commandInput.getTimestamp());
             output.add(node);
+            Transcation transcation = new Transcation();
+            transcation.setTimestamp(commandInput.getTimestamp());
+            transcation.setDescription("Account couldn't be deleted - there are funds remaining");
+            user.getTranscations().add(transcation);
             return;
         }
 
@@ -327,7 +330,34 @@ public class BankingCommandVisitor implements CommandVisitor {
                         transcation.setDescription("Card payment");
                         transcation.setAmountNotStr(amountInAccountCurrency);
                         transcation.setCommeriant(commandInput.getCommerciant());
+                        transcation.setAccountThatMadeTheTranscation(account.getIBAN());
                         user.getTranscations().add(transcation);
+                        if (card2.isOneTime()){
+                            account.getCards().remove(card2);
+                            Card newOneTimeCard = new Card();
+                            newOneTimeCard.setActive(true);
+                            newOneTimeCard.setOneTime(true);
+                            newOneTimeCard.setCardNumber(Utils.generateCardNumber());
+                            newOneTimeCard.setTimeStamp(commandInput.getTimestamp());
+                            account.getCards().add(newOneTimeCard);
+                        }
+                        Commerciants commerciant = new Commerciants();
+                        commerciant.setCommerciantName(commandInput.getCommerciant());
+                        commerciant.setTotal(amountInAccountCurrency);
+                        commerciant.setAccountThatPayedTheCommerciant(account.getIBAN());
+                        boolean found = false;
+                        for (Commerciants comm : user.getCommerciants()) {
+                            if (comm.getCommerciantName().equals(commandInput.getCommerciant())) {
+                                comm.setTotal(comm.getTotal() + amountInAccountCurrency);
+                                found = true;
+                            }
+                        }
+                        if (!found) {
+                            user.getCommerciants().add(commerciant);
+                        }
+//                        if (card2.isOneTime()) {
+//                            card2.setActive(false);
+//                        }
                         return;
                     } else if (account.getBalance() < amountInAccountCurrency) {
                         Transcation transcation = new Transcation();
@@ -362,6 +392,10 @@ public class BankingCommandVisitor implements CommandVisitor {
         String email = commandInput.getEmail();
 
         User senderUser = CommandHelper.findUserByEmail(users, email);
+        User receiverUser = CommandHelper.findUserByIBANOrAlias(users, receiverIdentifier);
+        if (receiverUser == null) {
+            return;
+        }
 
         if (senderUser != null) {
             Account sender = CommandHelper.findAccountByIBANWithoutEmail(users, senderIdentifier);
@@ -390,6 +424,16 @@ public class BankingCommandVisitor implements CommandVisitor {
             if (sender.getCurrency().equals(receiver.getCurrency())) {
                 sender.setBalance(sender.getBalance() - amount);
                 receiver.setBalance(receiver.getBalance() + amount);
+                Transcation transcation2 = new Transcation();
+                transcation2.setTimestamp(commandInput.getTimestamp());
+                transcation2.setDescription(commandInput.getDescription());
+                transcation2.setSenderIBAN(sender.getIBAN());
+                transcation2.setReceiverIBAN(receiver.getIBAN());
+                String formattedAmount2 = String
+                        .format("%.1f %s", commandInput.getAmount(), receiver.getCurrency());
+                transcation2.setAmount(formattedAmount2);
+                transcation2.setTransferType("received");
+                receiverUser.getTranscations().add(transcation2);
             } else {
                 double convertedAmount =
                         CommandHelper
@@ -397,6 +441,26 @@ public class BankingCommandVisitor implements CommandVisitor {
                                         receiver.getCurrency(), exchangeRates);
                 sender.setBalance(sender.getBalance() - amount);
                 receiver.setBalance(receiver.getBalance() + convertedAmount);
+                Transcation transcation2 = new Transcation();
+                transcation2.setTimestamp(commandInput.getTimestamp());
+                transcation2.setDescription(commandInput.getDescription());
+                transcation2.setSenderIBAN(sender.getIBAN());
+                transcation2.setReceiverIBAN(receiver.getIBAN());
+                String formattedAmount2;
+                if (convertedAmount * 100 % 10 == 0) {
+                    formattedAmount2 = String
+                            .format("%.1f %s", convertedAmount, receiver.getCurrency());
+                } else if (convertedAmount * 1000 % 10 == 0) {
+                    formattedAmount2 = String
+                            .format("%.2f %s", convertedAmount, receiver.getCurrency());
+                } else {
+                    formattedAmount2 = String
+                            .format("%.14f %s", convertedAmount, receiver.getCurrency());
+                }
+
+                transcation2.setAmount(formattedAmount2);
+                transcation2.setTransferType("received");
+                receiverUser.getTranscations().add(transcation2);
             }
             Transcation transcation = new Transcation();
             transcation.setTimestamp(commandInput.getTimestamp());
@@ -408,6 +472,9 @@ public class BankingCommandVisitor implements CommandVisitor {
             transcation.setAmount(formattedAmount);
             transcation.setTransferType("sent");
             senderUser.getTranscations().add(transcation);
+
+
+
 
         }
     }
@@ -487,8 +554,9 @@ public class BankingCommandVisitor implements CommandVisitor {
                         involvedAccountsArray.add(account);
                     }
                 }
-
-
+                if (transaction.getError() != null) {
+                    transactionNode.put("error", transaction.getError());
+                }
                 transactionsArray.add(transactionNode);
             }
 
@@ -561,11 +629,24 @@ public class BankingCommandVisitor implements CommandVisitor {
      *
      */
     public void visit(final ChangeInterestRate command) {
-        CommandInput commandInput = command.getCommandInput();
+        CommandInput commandInput = command.getCommand();
         ArrayList<User> users = command.getUsers();
+        ObjectNode node = command.getNode();
+        ObjectMapper mapper = command.getMapper();
+        ArrayNode output = command.getOutput();
         Account account = CommandHelper
                         .findAccountByIBANWithoutEmail(users, commandInput.getAccount());
         if (account == null) {
+            return;
+        }
+        if (!account.getAccountType().equals("savings")) {
+            node.put("command", commandInput.getCommand());
+            ObjectNode outputNode = mapper.createObjectNode();
+            outputNode.put("timestamp", commandInput.getTimestamp());
+            outputNode.put("description", "This is not a savings account");
+            node.set("output", outputNode);
+            node.put("timestamp", commandInput.getTimestamp());
+            output.add(node);
             return;
         }
         account.setInterestRate(commandInput.getInterestRate());
@@ -591,6 +672,14 @@ public class BankingCommandVisitor implements CommandVisitor {
             }
             accounts.add(account);
         }
+        ArrayList<User> usersInSplit = new ArrayList<>();
+        for (Account account : accounts) {
+            User user = CommandHelper.findUserByIBAN(users, account.getIBAN());
+            if (user == null) {
+                return;
+            }
+            usersInSplit.add(user);
+        }
 
         double splitAmount = totalAmount / accounts.size();
 
@@ -603,6 +692,25 @@ public class BankingCommandVisitor implements CommandVisitor {
             }
 
             if (account.getBalance() < amountInAccountCurrency) {
+                Transcation transaction = new Transcation();
+                transaction.setTimestamp(timestamp);
+                transaction
+                        .setDescription("Split payment of "
+                                + String.format("%.2f", totalAmount)
+                                + " "
+                                + baseCurrency);
+                transaction.setCurrency(commandInput.getCurrency());
+                transaction
+                        .setAmountNotStr(commandInput.getAmount()
+                                / commandInput.getAccounts().size());
+                transaction.setInvolvedAccounts(new ArrayList<>(accountIdentifiers));
+                transaction.setError("Account" + " " + account.getIBAN()
+                                    + " " + "has insufficient funds for a split payment.");
+                for (User user : usersInSplit) {
+                   user.getTranscations().add(transaction);
+                    }
+
+
                 return;
             }
         }
@@ -639,6 +747,250 @@ public class BankingCommandVisitor implements CommandVisitor {
             }
         }
     }
+    /**
+     *
+     */
+    public void visit(final Report command) {
+        CommandInput commandInput = command.getCommand();
+        ArrayList<User> users = command.getUsers();
+        ObjectNode node = command.getNode();
+        ObjectMapper mapper = command.getMapper();
+        ArrayNode output = command.getOutput();
+
+        String IBAN = commandInput.getAccount();
+        User user = CommandHelper.findUserByIBAN(users, IBAN);
+
+        if (user == null) {
+            node.put("command", commandInput.getCommand());
+            ObjectNode outputNode = mapper.createObjectNode();
+            outputNode.put("timestamp", commandInput.getTimestamp());
+            outputNode.put("description", "Account not found");
+            node.set("output", outputNode);
+            node.put("timestamp", commandInput.getTimestamp());
+            output.add(node);
+            return;
+        }
+
+        Account account = CommandHelper.findAccountByIban(user, IBAN);
+        if (account == null) {
+            node.put("command", commandInput.getCommand());
+            ObjectNode outputNode = mapper.createObjectNode();
+            outputNode.put("timestamp", commandInput.getTimestamp());
+            outputNode.put("description", "Account not found");
+            node.set("output", outputNode);
+            node.put("timestamp", commandInput.getTimestamp());
+            output.add(node);
+            return;
+        }
+
+
+        int startTimestamp = commandInput.getStartTimestamp();
+        int endTimestamp = commandInput.getEndTimestamp();
+
+        ArrayList<Transcation> transactions = user.getTranscations();
+        transactions.sort(Comparator.comparingInt(Transcation::getTimestamp));
+
+        ArrayNode transactionsArray = mapper.createArrayNode();
+        for (Transcation transaction : transactions) {
+            if (transaction.getTimestamp() >= startTimestamp
+                    && transaction.getTimestamp() <= endTimestamp) {
+                ObjectNode transactionNode = mapper.createObjectNode();
+                transactionNode.put("timestamp", transaction.getTimestamp());
+                transactionNode.put("description", transaction.getDescription());
+                if (transaction.getCurrency() != null) {
+                    transactionNode.put("currency", transaction.getCurrency());
+                }
+                if (transaction.getAmountNotStr() != 0) {
+                    transactionNode.put("amount", transaction.getAmountNotStr());
+                }
+                if (transaction.getCommeriant() != null) {
+                    transactionNode.put("commerciant", transaction.getCommeriant());
+                }
+                if (transaction.getCard() != null) {
+                    transactionNode.put("card", transaction.getCard());
+                }
+                if (transaction.getCardHolder() != null) {
+                    transactionNode.put("cardHolder", transaction.getCardHolder());
+                }
+                if (transaction.getAccount() != null) {
+                    transactionNode.put("account", transaction.getAccount());
+                }
+                if (transaction.getSenderIBAN() != null) {
+                    transactionNode.put("senderIBAN", transaction.getSenderIBAN());
+                }
+                if (transaction.getReceiverIBAN() != null) {
+                    transactionNode.put("receiverIBAN", transaction.getReceiverIBAN());
+                }
+                if (transaction.getAmount() != null) {
+                    transactionNode.put("amount", transaction.getAmount());
+                }
+                if (transaction.getTransferType() != null) {
+                    transactionNode.put("transferType", transaction.getTransferType());
+                }
+                if (transaction.getInvolvedAccounts() != null) {
+                    ArrayNode involvedAccountsArray = transactionNode.putArray("involvedAccounts");
+                    for (String acc : transaction.getInvolvedAccounts()) {
+                        involvedAccountsArray.add(acc);
+                    }
+                }
+                if (transaction.getError() != null) {
+                    transactionNode.put("error", transaction.getError());
+                }
+                transactionsArray.add(transactionNode);
+            }
+        }
+
+        ObjectNode outputNode = mapper.createObjectNode();
+        outputNode.put("IBAN", IBAN);
+        outputNode.put("balance", account.getBalance());
+        outputNode.put("currency", account.getCurrency());
+        outputNode.set("transactions", transactionsArray);
+
+        node.put("command", "report");
+        node.set("output", outputNode);
+        node.put("timestamp", commandInput.getTimestamp());
+
+        output.add(node);
+    }
+    /**
+     *
+     */
+    public void visit(final SpendingsReport command) {
+        CommandInput commandInput = command.getCommand();
+        ArrayList<User> users = command.getUsers();
+        ObjectNode node = command.getNode();
+        ObjectMapper mapper = command.getMapper();
+        ArrayNode output = command.getOutput();
+
+        String IBAN = commandInput.getAccount();
+        User user = CommandHelper.findUserByIBAN(users, IBAN);
+        if (user == null) {
+            node.put("command", commandInput.getCommand());
+            ObjectNode outputNode = mapper.createObjectNode();
+            outputNode.put("timestamp", commandInput.getTimestamp());
+            outputNode.put("description", "Account not found");
+            node.set("output", outputNode);
+            node.put("timestamp", commandInput.getTimestamp());
+            output.add(node);
+            return;
+        }
+        Account account = CommandHelper.findAccountByIban(user, IBAN);
+        if (account == null) {
+            node.put("command", commandInput.getCommand());
+            ObjectNode outputNode = mapper.createObjectNode();
+            outputNode.put("timestamp", commandInput.getTimestamp());
+            outputNode.put("description", "Account not found");
+            node.set("output", outputNode);
+            node.put("timestamp", commandInput.getTimestamp());
+            output.add(node);
+            return;
+        }
+
+        int startTimestamp = commandInput.getStartTimestamp();
+        int endTimestamp = commandInput.getEndTimestamp();
+
+        node.put("command", commandInput.getCommand());
+        ObjectNode outputNode = mapper.createObjectNode();
+
+        outputNode.put("IBAN", IBAN);
+        outputNode.put("balance", account.getBalance());
+        outputNode.put("currency", account.getCurrency());
+
+        ArrayNode transactionsArray = mapper.createArrayNode();
+        ArrayList<Commerciants> reportCommerciants = new ArrayList<>();
+
+        for (Transcation transaction : user.getTranscations()) {
+            if ((transaction.getDescription().equals("Card payment")
+                    && transaction.getAccountThatMadeTheTranscation().equals(IBAN))
+                    && transaction.getTimestamp() >= startTimestamp
+                    && transaction.getTimestamp() <= endTimestamp) {
+
+                ObjectNode transactionNode = mapper.createObjectNode();
+                transactionNode.put("timestamp", transaction.getTimestamp());
+                transactionNode.put("description", transaction.getDescription());
+                transactionNode.put("amount", transaction.getAmountNotStr());
+                transactionNode.put("commerciant", transaction.getCommeriant());
+                transactionsArray.add(transactionNode);
+
+                boolean found = false;
+                for (Commerciants commerciant : reportCommerciants) {
+                    if (commerciant.getCommerciantName().equals(transaction.getCommeriant())) {
+                        commerciant.setTotal(commerciant.getTotal() + transaction.getAmountNotStr());
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    Commerciants newCommerciant = new Commerciants();
+                    newCommerciant.setCommerciantName(transaction.getCommeriant());
+                    newCommerciant.setTotal(transaction.getAmountNotStr());
+                    newCommerciant.setAccountThatPayedTheCommerciant(IBAN);
+                    reportCommerciants.add(newCommerciant);
+                }
+            }
+        }
+
+        outputNode.set("transactions", transactionsArray);
+
+        ArrayNode commerciantsArray = mapper.createArrayNode();
+        reportCommerciants.sort(Comparator.comparing(Commerciants::getCommerciantName));
+        for (Commerciants commerciant : reportCommerciants) {
+            if (!commerciant.getAccountThatPayedTheCommerciant().equals(IBAN)) {
+                continue;
+            }
+            ObjectNode commerciantNode = mapper.createObjectNode();
+            commerciantNode.put("commerciant", commerciant.getCommerciantName());
+            commerciantNode.put("total", commerciant.getTotal());
+            commerciantsArray.add(commerciantNode);
+        }
+
+        outputNode.set("commerciants", commerciantsArray);
+
+        node.set("output", outputNode);
+        node.put("timestamp", commandInput.getTimestamp());
+
+        output.add(node);
+    }
+    /**
+     *
+     */
+    public void visit(final AddInterest command) {
+        CommandInput commandInput = command.getCommand();
+        ArrayList<User> users = command.getUsers();
+        ObjectNode node = command.getNode();
+        ObjectMapper mapper = command.getMapper();
+        ArrayNode output = command.getOutput();
+
+        String IBAN = commandInput.getAccount();
+        User user = CommandHelper.findUserByIBAN(users, IBAN);
+        if (user == null) {
+            return;
+        }
+        Account account = CommandHelper.findAccountByIban(user, IBAN);
+        if (account == null) {
+            return;
+        }
+        if (!account.getAccountType().equals("savings")) {
+            node.put("command", commandInput.getCommand());
+            ObjectNode outputNode = mapper.createObjectNode();
+            outputNode.put("timestamp", commandInput.getTimestamp());
+            outputNode.put("description", "This is not a savings account");
+            node.set("output", outputNode);
+            node.put("timestamp", commandInput.getTimestamp());
+            output.add(node);
+            return;
+        }
+        double interest = account.getInterestRate() * account.getBalance();
+        account.setBalance(account.getBalance() + interest);
+
+
+
+    }
+
+
+
+
 
 }
 

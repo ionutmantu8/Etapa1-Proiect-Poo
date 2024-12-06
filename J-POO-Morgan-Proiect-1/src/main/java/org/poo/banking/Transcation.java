@@ -23,4 +23,6 @@ public class Transcation {
     private String currency;
     private String ammount;
     private List<String> involvedAccounts;
+    private String error;
+    private String accountThatMadeTheTranscation;
 }

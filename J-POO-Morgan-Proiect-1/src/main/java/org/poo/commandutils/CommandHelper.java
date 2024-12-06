@@ -5,6 +5,7 @@ import org.poo.userutils.Account;
 import org.poo.userutils.Card;
 import org.poo.userutils.User;
 
+import javax.sound.midi.MidiDeviceReceiver;
 import java.util.*;
 
 public final class CommandHelper {
@@ -201,6 +202,36 @@ public final class CommandHelper {
                     if (card.getCardNumber().equals(cardNumber)) {
                         return user;
                     }
+                }
+            }
+        }
+        return null;
+    }
+    /**
+     *
+     */
+    public static User findUserByIBAN(final ArrayList<User> users,
+                                                        final String IBAN) {
+        for (User user : users) {
+            for (Account account : user.getAccounts()) {
+                if (account.getIBAN().equals(IBAN)) {
+                        return user;
+                    }
+            }
+        }
+        return null;
+    }
+    /**
+     *
+     */
+    public static User findUserByIBANOrAlias(final ArrayList<User> users,
+                                      final String identifier) {
+        for (User user : users) {
+            for (Account account : user.getAccounts()) {
+                if (account.getIBAN().equals(identifier)
+                        || (account.getAlias() != null
+                        && account.getAlias().equals(identifier))) {
+                    return user;
                 }
             }
         }
