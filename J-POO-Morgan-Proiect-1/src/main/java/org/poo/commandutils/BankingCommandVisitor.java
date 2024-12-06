@@ -684,13 +684,8 @@ public class BankingCommandVisitor implements CommandVisitor {
         double splitAmount = totalAmount / accounts.size();
 
         for (Account account : accounts) {
-            double amountInAccountCurrency = splitAmount;
-
-            if (!account.getCurrency().equals(baseCurrency)) {
-                amountInAccountCurrency = CommandHelper.convertCurrency(
-                        splitAmount, baseCurrency, account.getCurrency(), exchangeRates);
-            }
-
+               double amountInAccountCurrency = CommandHelper.convertCurrency(
+                           splitAmount, baseCurrency, account.getCurrency(), exchangeRates);
             if (account.getBalance() < amountInAccountCurrency) {
                 Transcation transaction = new Transcation();
                 transaction.setTimestamp(timestamp);
@@ -716,13 +711,11 @@ public class BankingCommandVisitor implements CommandVisitor {
         }
 
         for (Account account : accounts) {
-            double amountInAccountCurrency = splitAmount;
 
-            if (!account.getCurrency().equals(baseCurrency)) {
-                amountInAccountCurrency = CommandHelper.convertCurrency(
+
+
+            double amountInAccountCurrency = CommandHelper.convertCurrency(
                         splitAmount, baseCurrency, account.getCurrency(), exchangeRates);
-            }
-
             account.setBalance(account.getBalance() - amountInAccountCurrency);
 
             Transcation transaction = new Transcation();
