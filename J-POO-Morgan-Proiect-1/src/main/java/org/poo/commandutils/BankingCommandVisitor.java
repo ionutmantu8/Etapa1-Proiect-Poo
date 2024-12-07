@@ -333,6 +333,13 @@ public class BankingCommandVisitor implements CommandVisitor {
                         transcation.setAccountThatMadeTheTranscation(account.getIBAN());
                         user.getTranscations().add(transcation);
                         if (card2.isOneTime()){
+                            Transcation deleteTranscation = new Transcation();
+                            deleteTranscation.setTimestamp(commandInput.getTimestamp());
+                            deleteTranscation.setDescription("The card has been destroyed");
+                            deleteTranscation.setCard(cardNumber);
+                            deleteTranscation.setCardHolder(user.getEmail());
+                            deleteTranscation.setAccount(account.getIBAN());
+                            user.getTranscations().add(deleteTranscation);
                             account.getCards().remove(card2);
                             Card newOneTimeCard = new Card();
                             newOneTimeCard.setActive(true);
@@ -340,6 +347,13 @@ public class BankingCommandVisitor implements CommandVisitor {
                             newOneTimeCard.setCardNumber(Utils.generateCardNumber());
                             newOneTimeCard.setTimeStamp(commandInput.getTimestamp());
                             account.getCards().add(newOneTimeCard);
+                            Transcation addNewCardTransaciton = new Transcation();
+                            addNewCardTransaciton.setTimestamp(commandInput.getTimestamp());
+                            addNewCardTransaciton.setDescription("New card created");
+                            addNewCardTransaciton.setCard(newOneTimeCard.getCardNumber());
+                            addNewCardTransaciton.setCardHolder(user.getEmail());
+                            addNewCardTransaciton.setAccount(account.getIBAN());
+                            user.getTranscations().add(addNewCardTransaciton);
                         }
                         Commerciants commerciant = new Commerciants();
                         commerciant.setCommerciantName(commandInput.getCommerciant());
@@ -355,9 +369,6 @@ public class BankingCommandVisitor implements CommandVisitor {
                         if (!found) {
                             user.getCommerciants().add(commerciant);
                         }
-//                        if (card2.isOneTime()) {
-//                            card2.setActive(false);
-//                        }
                         return;
                     } else if (account.getBalance() < amountInAccountCurrency) {
                         Transcation transcation = new Transcation();
@@ -421,7 +432,19 @@ public class BankingCommandVisitor implements CommandVisitor {
                 return;
             }
 
+
+
             if (sender.getCurrency().equals(receiver.getCurrency())) {
+                Transcation transcation = new Transcation();
+                transcation.setTimestamp(commandInput.getTimestamp());
+                transcation.setDescription(commandInput.getDescription());
+                transcation.setSenderIBAN(sender.getIBAN());
+                transcation.setReceiverIBAN(receiver.getIBAN());
+                String formattedAmount = String
+                        .format("%.1f %s", commandInput.getAmount(), sender.getCurrency());
+                transcation.setAmount(formattedAmount);
+                transcation.setTransferType("sent");
+                senderUser.getTranscations().add(transcation);
                 sender.setBalance(sender.getBalance() - amount);
                 receiver.setBalance(receiver.getBalance() + amount);
                 Transcation transcation2 = new Transcation();
@@ -440,6 +463,16 @@ public class BankingCommandVisitor implements CommandVisitor {
                                 .convertCurrency(amount, sender.getCurrency(),
                                         receiver.getCurrency(), exchangeRates);
                 sender.setBalance(sender.getBalance() - amount);
+                Transcation transcation = new Transcation();
+                transcation.setTimestamp(commandInput.getTimestamp());
+                transcation.setDescription(commandInput.getDescription());
+                transcation.setSenderIBAN(sender.getIBAN());
+                transcation.setReceiverIBAN(receiver.getIBAN());
+                String formattedAmount = String
+                        .format("%.1f %s", commandInput.getAmount(), sender.getCurrency());
+                transcation.setAmount(formattedAmount);
+                transcation.setTransferType("sent");
+                senderUser.getTranscations().add(transcation);
                 receiver.setBalance(receiver.getBalance() + convertedAmount);
                 Transcation transcation2 = new Transcation();
                 transcation2.setTimestamp(commandInput.getTimestamp());
@@ -462,16 +495,7 @@ public class BankingCommandVisitor implements CommandVisitor {
                 transcation2.setTransferType("received");
                 receiverUser.getTranscations().add(transcation2);
             }
-            Transcation transcation = new Transcation();
-            transcation.setTimestamp(commandInput.getTimestamp());
-            transcation.setDescription(commandInput.getDescription());
-            transcation.setSenderIBAN(sender.getIBAN());
-            transcation.setReceiverIBAN(receiver.getIBAN());
-            String formattedAmount = String
-                    .format("%.1f %s", commandInput.getAmount(), sender.getCurrency());
-            transcation.setAmount(formattedAmount);
-            transcation.setTransferType("sent");
-            senderUser.getTranscations().add(transcation);
+
 
 
 
@@ -650,6 +674,15 @@ public class BankingCommandVisitor implements CommandVisitor {
             return;
         }
         account.setInterestRate(commandInput.getInterestRate());
+        Transcation transcation = new Transcation();
+        transcation.setTimestamp(commandInput.getTimestamp());
+        transcation.setDescription("Interest rate of the account changed to " + commandInput.getInterestRate());
+        User user = CommandHelper.findUserByIBAN(users, commandInput.getAccount());
+        if (user == null) {
+            return;
+        }
+        user.getTranscations().add(transcation);
+
     }
     /**
      *
@@ -658,88 +691,85 @@ public class BankingCommandVisitor implements CommandVisitor {
         CommandInput commandInput = command.getCommand();
         ArrayList<User> users = command.getUsers();
         ArrayList<ExchangeRate> exchangeRates = command.getExchangeRates();
-        List<String> accountIdentifiers = commandInput.getAccounts();
         double totalAmount = commandInput.getAmount();
         String baseCurrency = commandInput.getCurrency();
+        List<String> accountIdentifiers = commandInput.getAccounts();
         int timestamp = commandInput.getTimestamp();
 
         ArrayList<Account> accounts = new ArrayList<>();
-
-        for (String accountIdentifier : accountIdentifiers) {
-            Account account = CommandHelper.findAccountByIBANWithoutEmail(users, accountIdentifier);
-            if (account == null) {
-                return;
-            }
-            accounts.add(account);
-        }
         ArrayList<User> usersInSplit = new ArrayList<>();
-        for (Account account : accounts) {
-            User user = CommandHelper.findUserByIBAN(users, account.getIBAN());
-            if (user == null) {
+        String insufficientFundsError = null;
+        for (String iban : accountIdentifiers) {
+            Account account = CommandHelper.findAccountByIBANWithoutEmail(users, iban);
+            User user = CommandHelper.findUserByIBAN(users, iban);
+
+            if (account == null || user == null) {
                 return;
             }
+
+            accounts.add(account);
             usersInSplit.add(user);
         }
 
         double splitAmount = totalAmount / accounts.size();
+        ArrayList<Double> convertedAmounts = new ArrayList<>();
 
         for (Account account : accounts) {
-               double amountInAccountCurrency = CommandHelper.convertCurrency(
-                           splitAmount, baseCurrency, account.getCurrency(), exchangeRates);
-            if (account.getBalance() < amountInAccountCurrency) {
-                Transcation transaction = new Transcation();
-                transaction.setTimestamp(timestamp);
-                transaction
-                        .setDescription("Split payment of "
-                                + String.format("%.2f", totalAmount)
-                                + " "
-                                + baseCurrency);
-                transaction.setCurrency(commandInput.getCurrency());
-                transaction
-                        .setAmountNotStr(commandInput.getAmount()
-                                / commandInput.getAccounts().size());
-                transaction.setInvolvedAccounts(new ArrayList<>(accountIdentifiers));
-                transaction.setError("Account" + " " + account.getIBAN()
-                                    + " " + "has insufficient funds for a split payment.");
-                for (User user : usersInSplit) {
-                   user.getTranscations().add(transaction);
-                    }
+            double amountInAccountCurrency = splitAmount;
 
-
-                return;
+            if (!account.getCurrency().equals(baseCurrency)) {
+                amountInAccountCurrency = CommandHelper.convertCurrency(
+                        splitAmount, baseCurrency, account.getCurrency(), exchangeRates);
             }
+
+            if (account.getBalance() < amountInAccountCurrency) {
+                insufficientFundsError = "Account " + account.getIBAN()
+                        + " has insufficient funds for a split payment.";
+            }
+
+            convertedAmounts.add(amountInAccountCurrency);
         }
 
-        for (Account account : accounts) {
+        if (insufficientFundsError != null) {
+            Transcation transaction = new Transcation();
+            transaction.setTimestamp(timestamp);
+            transaction.setDescription("Split payment of "
+                    + String.format("%.2f", totalAmount)
+                    + " "
+                    + baseCurrency);
+            transaction.setCurrency(baseCurrency);
+            transaction.setAmountNotStr(splitAmount);
+            transaction.setInvolvedAccounts(accountIdentifiers);
+            transaction.setError(insufficientFundsError); // Doar ultima eroare
 
+            for (User user : usersInSplit) {
+                user.getTranscations().add(transaction);
+            }
 
+            return;
+        }
 
-            double amountInAccountCurrency = CommandHelper.convertCurrency(
-                        splitAmount, baseCurrency, account.getCurrency(), exchangeRates);
+        for (int i = 0; i < accounts.size(); i++) {
+            Account account = accounts.get(i);
+            User user = usersInSplit.get(i);
+
+            double amountInAccountCurrency = convertedAmounts.get(i);
             account.setBalance(account.getBalance() - amountInAccountCurrency);
 
             Transcation transaction = new Transcation();
             transaction.setTimestamp(timestamp);
-            transaction
-                    .setDescription("Split payment of "
-                                    + String.format("%.2f", totalAmount)
-                                    + " "
-                                    + baseCurrency);
-            transaction.setCurrency(commandInput.getCurrency());
-            transaction
-                    .setAmountNotStr(commandInput.getAmount() / commandInput.getAccounts().size());
-            transaction.setInvolvedAccounts(new ArrayList<>(accountIdentifiers));
+            transaction.setDescription("Split payment of "
+                    + String.format("%.2f", totalAmount)
+                    + " "
+                    + baseCurrency);
+            transaction.setCurrency(baseCurrency);
+            transaction.setAmountNotStr(splitAmount);
+            transaction.setInvolvedAccounts(accountIdentifiers);
 
-            for (User user : users) {
-                for (Account userAccount : user.getAccounts()) {
-                    if (userAccount.getIBAN().equals(account.getIBAN())) {
-                        user.getTranscations().add(transaction);
-                        break;
-                    }
-                }
-            }
+            user.getTranscations().add(transaction);
         }
     }
+
     /**
      *
      */
@@ -873,6 +903,15 @@ public class BankingCommandVisitor implements CommandVisitor {
             ObjectNode outputNode = mapper.createObjectNode();
             outputNode.put("timestamp", commandInput.getTimestamp());
             outputNode.put("description", "Account not found");
+            node.set("output", outputNode);
+            node.put("timestamp", commandInput.getTimestamp());
+            output.add(node);
+            return;
+        }
+        if (account.getAccountType().equals("savings")) {
+            node.put("command", commandInput.getCommand());
+            ObjectNode outputNode = mapper.createObjectNode();
+            outputNode.put("error", "This kind of report is not supported for a saving account");
             node.set("output", outputNode);
             node.put("timestamp", commandInput.getTimestamp());
             output.add(node);
