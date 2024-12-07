@@ -8,7 +8,7 @@ import org.poo.userutils.User;
 
 import java.util.ArrayList;
 
-public class SpendingsReport extends Report implements Visitable{
+public class SpendingsReport extends Report implements Visitable {
 
     public SpendingsReport(final ArrayList<User> users, final CommandInput commandInput,
                            final ObjectNode node, final ObjectMapper mapper,
@@ -16,7 +16,10 @@ public class SpendingsReport extends Report implements Visitable{
         super(users, mapper, output, node, commandInput);
     }
 
-
+    /**
+     *
+     * @param visitor the visitor
+     */
     @Override
     public void accept(final CommandVisitor visitor) {
         visitor.visit(this);

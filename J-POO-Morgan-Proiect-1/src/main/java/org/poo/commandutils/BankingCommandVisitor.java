@@ -332,7 +332,7 @@ public class BankingCommandVisitor implements CommandVisitor {
                         transcation.setCommeriant(commandInput.getCommerciant());
                         transcation.setAccountThatMadeTheTranscation(account.getIBAN());
                         user.getTranscations().add(transcation);
-                        if (card2.isOneTime()){
+                        if (card2.isOneTime()) {
                             Transcation deleteTranscation = new Transcation();
                             deleteTranscation.setTimestamp(commandInput.getTimestamp());
                             deleteTranscation.setDescription("The card has been destroyed");
@@ -676,7 +676,8 @@ public class BankingCommandVisitor implements CommandVisitor {
         account.setInterestRate(commandInput.getInterestRate());
         Transcation transcation = new Transcation();
         transcation.setTimestamp(commandInput.getTimestamp());
-        transcation.setDescription("Interest rate of the account changed to " + commandInput.getInterestRate());
+        transcation.setDescription("Interest rate of the account changed to "
+                                    + commandInput.getInterestRate());
         User user = CommandHelper.findUserByIBAN(users, commandInput.getAccount());
         if (user == null) {
             return;
@@ -946,7 +947,8 @@ public class BankingCommandVisitor implements CommandVisitor {
 
                 boolean found = false;
                 for (Commerciants commerciant : reportCommerciants) {
-                    if (commerciant.getCommerciantName().equals(transaction.getCommeriant())) {
+                    if (commerciant.getCommerciantName()
+                            .equals(transaction.getCommeriant())) {
                         commerciant.setTotal(commerciant.getTotal() + transaction.getAmountNotStr());
                         found = true;
                         break;

@@ -15,7 +15,7 @@ public class User {
     private String email;
     private ArrayList<Account> accounts;
     private ArrayList<Transcation> transcations;
-    private ArrayList <Commerciants> commerciants;
+    private ArrayList<Commerciants> commerciants;
     public User() {
         accounts = new ArrayList<>();
         transcations = new ArrayList<>();
