@@ -12,7 +12,10 @@ import org.poo.userutils.Card;
 import org.poo.userutils.User;
 import org.poo.utils.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 
 public class BankingCommandVisitor implements CommandVisitor {
     /**
@@ -949,7 +952,8 @@ public class BankingCommandVisitor implements CommandVisitor {
                 for (Commerciants commerciant : reportCommerciants) {
                     if (commerciant.getCommerciantName()
                             .equals(transaction.getCommeriant())) {
-                        commerciant.setTotal(commerciant.getTotal() + transaction.getAmountNotStr());
+                        commerciant.setTotal(commerciant.getTotal()
+                                            + transaction.getAmountNotStr());
                         found = true;
                         break;
                     }

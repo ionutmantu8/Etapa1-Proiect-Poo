@@ -8,7 +8,7 @@ import org.poo.userutils.User;
 
 import java.util.ArrayList;
 
-public class AddInterest extends Report implements Visitable{
+public class AddInterest extends Report implements Visitable {
 
     public AddInterest(final ArrayList<User> users, final CommandInput commandInput,
                            final ObjectNode node, final ObjectMapper mapper,

@@ -11,4 +11,5 @@ public class ExchangeRate {
     private double rate;
 
 
+
 }
