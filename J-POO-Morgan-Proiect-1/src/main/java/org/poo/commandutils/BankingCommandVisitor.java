@@ -423,9 +423,6 @@ public class BankingCommandVisitor implements CommandVisitor {
                 return;
             }
 
-            if ("savings".equals(sender.getAccountType())) {
-                return;
-            }
 
             if (sender.getBalance() < amount) {
                 Transcation transcation = new Transcation();
