@@ -20,8 +20,11 @@ public final class CommandHelper {
          */
     }
     /**
+     * Finds a user by their email address.
      *
-     *
+     * @param usersList the list of users
+     * @param accountEmail the email address of the user
+     * @return the user with the specified email address, or null if not found
      */
     public static User findUserByEmail(final ArrayList<User> usersList,
                                        final String accountEmail) {
@@ -33,8 +36,13 @@ public final class CommandHelper {
         return null;
     }
 
+
     /**
+     * Finds an account by its IBAN.
      *
+     * @param user the user who owns the account
+     * @param IBAN the IBAN of the account
+     * @return the account with the specified IBAN, or null if not found
      */
     public static Account findAccountByIban(final User user, final String IBAN) {
         for (Account account : user.getAccounts()) {
@@ -44,8 +52,13 @@ public final class CommandHelper {
         }
         return null;
     }
+
     /**
+     * Finds a card by its number.
      *
+     * @param user the user who owns the card
+     * @param cardNumber the number of the card
+     * @return the card with the specified number, or null if not found
      */
     public static Card findCardByNumber(final User user, final String cardNumber) {
         for (Account account : user.getAccounts()) {
@@ -68,7 +81,10 @@ public final class CommandHelper {
         }
     }
     /**
+     * Builds a graph of exchange rates.
      *
+     * @param exchangeRates the list of exchange rates
+     * @return a map representing the graph of exchange rates
      */
     public static Map<String, Map<String, Double>> buildGraph(
             final ArrayList<ExchangeRate> exchangeRates) {
@@ -86,7 +102,12 @@ public final class CommandHelper {
         return graph;
     }
     /**
+     * Finds the best exchange rate between two currencies.
      *
+     * @param from the source currency
+     * @param to the target currency
+     * @param graph the graph of exchange rates
+     * @return the best exchange rate, or 0.0 if no rate is found
      */
     public static double findBestRate(final String from, final String to,
                                       final Map<String, Map<String, Double>> graph) {
@@ -124,7 +145,13 @@ public final class CommandHelper {
         return 0.0;
     }
     /**
+     * Converts an amount from one currency to another.
      *
+     * @param amount the amount to convert
+     * @param from the source currency
+     * @param to the target currency
+     * @param exchangeRates the list of exchange rates
+     * @return the converted amount
      */
     public static double convertCurrency(final double amount, final String from, final String to,
                                          final ArrayList<ExchangeRate> exchangeRates) {
@@ -133,8 +160,13 @@ public final class CommandHelper {
         return amount * rate;
     }
 
+
     /**
+     * Finds an account by its IBAN without requiring the user's email.
      *
+     * @param users the list of users
+     * @param IBAN the IBAN of the account
+     * @return the account with the specified IBAN, or null if not found
      */
     public static Account findAccountByIBANWithoutEmail(final ArrayList<User> users,
                                                         final String IBAN) {
@@ -149,7 +181,11 @@ public final class CommandHelper {
 
     }
     /**
+     * Finds an account by its IBAN or alias.
      *
+     * @param users the list of users
+     * @param identifier the IBAN or alias of the account
+     * @return the account with the specified IBAN or alias, or null if not found
      */
     public static Account findAccountByIBANOrAlias(final ArrayList<User> users,
                                                    final String identifier) {
@@ -166,7 +202,11 @@ public final class CommandHelper {
 
     }
     /**
+     * Finds a card by its number without requiring the user's email.
      *
+     * @param users the list of users
+     * @param cardNumber the number of the card
+     * @return the card with the specified number, or null if not found
      */
     public static Card findCardByNumberWithoutEmail(final ArrayList<User> users,
                                                      final String cardNumber) {
@@ -182,7 +222,11 @@ public final class CommandHelper {
         return null;
     }
     /**
+     * Finds an account by a card number without requiring the user's email.
      *
+     * @param users the list of users
+     * @param cardNumber the number of the card
+     * @return the account associated with the specified card number, or null if not found
      */
     public static Account findAccountByCardNumberWithoutEmail(final ArrayList<User> users,
                                                                final String cardNumber) {
@@ -198,7 +242,11 @@ public final class CommandHelper {
         return null;
     }
     /**
+     * Finds a user by a card number without requiring the user's email.
      *
+     * @param users the list of users
+     * @param cardNumber the number of the card
+     * @return the user associated with the specified card number, or null if not found
      */
     public static User findUserByCardNumberWithoutEmail(final ArrayList<User> users,
                                                          final String cardNumber) {
@@ -213,8 +261,13 @@ public final class CommandHelper {
         }
         return null;
     }
+
     /**
+     * Finds a user by an account's IBAN.
      *
+     * @param users the list of users
+     * @param IBAN the IBAN of the account
+     * @return the user associated with the specified IBAN, or null if not found
      */
     public static User findUserByIBAN(final ArrayList<User> users,
                                                         final String IBAN) {
@@ -228,7 +281,11 @@ public final class CommandHelper {
         return null;
     }
     /**
+     * Finds a user by an account's IBAN or alias.
      *
+     * @param users the list of users
+     * @param identifier the IBAN or alias of the account
+     * @return the user associated with the specified IBAN or alias, or null if not found
      */
     public static User findUserByIBANOrAlias(final ArrayList<User> users,
                                       final String identifier) {
