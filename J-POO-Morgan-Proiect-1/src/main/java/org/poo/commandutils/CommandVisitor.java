@@ -1,5 +1,14 @@
 package org.poo.commandutils;
 
+import org.poo.accountandcardutils.*;
+import org.poo.paymentutils.PayOnline;
+import org.poo.paymentutils.SendMoney;
+import org.poo.paymentutils.SplitPayment;
+import org.poo.printingutils.PrintTransactions;
+import org.poo.printingutils.PrintUsers;
+import org.poo.printingutils.Report;
+import org.poo.printingutils.SpendingsReport;
+
 public interface CommandVisitor {
     /**
      * Visit method for addAccount command

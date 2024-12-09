@@ -1,6 +1,8 @@
-package org.poo.commandutils;
+package org.poo.paymentutils;
 
 import org.poo.banking.ExchangeRate;
+import org.poo.commandutils.CommandVisitor;
+import org.poo.commandutils.Visitable;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 

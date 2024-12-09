@@ -3,23 +3,34 @@ package org.poo.commandutils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.poo.accountandcardutils.*;
 import org.poo.banking.Commerciants;
 import org.poo.banking.ExchangeRate;
 import org.poo.banking.Transcation;
 import org.poo.fileio.CommandInput;
+import org.poo.paymentutils.PayOnline;
+import org.poo.paymentutils.SendMoney;
+import org.poo.paymentutils.SplitPayment;
 import org.poo.userutils.Account;
 import org.poo.userutils.Card;
 import org.poo.userutils.User;
 import org.poo.utils.Utils;
+import org.poo.printingutils.PrintTransactions;
+import org.poo.printingutils.PrintUsers;
+import org.poo.printingutils.Report;
+import org.poo.printingutils.SpendingsReport;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
 
 public class BankingCommandVisitor implements CommandVisitor {
     /**
+     * Adds a new account for a user.
      *
+     * @param command the command containing the account details
      */
     @Override
     public void visit(final AddAccount command) {
@@ -43,7 +54,9 @@ public class BankingCommandVisitor implements CommandVisitor {
         }
     }
     /**
+     * Adds funds to an account.
      *
+     * @param command the command containing the account and amount details
      */
     @Override
     public void visit(final AddFunds command) {
@@ -61,8 +74,11 @@ public class BankingCommandVisitor implements CommandVisitor {
         }
 
     }
+
     /**
+     * Creates a new card for an account.
      *
+     * @param command the command containing the card details
      */
     @Override
     public void visit(final CreateCard command) {
@@ -71,9 +87,13 @@ public class BankingCommandVisitor implements CommandVisitor {
         String IBAN = commandInput.getAccount();
         String email = commandInput.getEmail();
         User user = CommandHelper.findUserByEmail(userList, email);
-        if (user != null) {
-            Account account = CommandHelper.findAccountByIban(user, IBAN);
-            if (account != null) {
+        if (user == null) {
+            return;
+        }
+        Account account = CommandHelper.findAccountByIban(user, IBAN);
+        if (account == null) {
+            return;
+        }
                 Card newCard = new Card();
                 newCard.setOneTime(false);
                 String cardNumber = Utils.generateCardNumber();
@@ -88,11 +108,13 @@ public class BankingCommandVisitor implements CommandVisitor {
                 transcation.setCardHolder(user.getEmail());
                 transcation.setAccount(IBAN);
                 user.getTranscations().add(transcation);
-            }
-        }
+
+
     }
     /**
+     * Prints the list of users aside with all their accounts and cards.
      *
+     * @param command the command containing the user details
      */
     @Override
     public void visit(final PrintUsers command) {
@@ -139,7 +161,9 @@ public class BankingCommandVisitor implements CommandVisitor {
         output.add(node);
     }
     /**
+     * Deletes an account.
      *
+     * @param command the command containing the account details
      */
     @Override
     public void visit(final DeleteAccount command) {
@@ -203,7 +227,9 @@ public class BankingCommandVisitor implements CommandVisitor {
         output.add(node);
     }
     /**
+     * Creates a one-time use card for an account.
      *
+     * @param command the command containing the card details
      */
     @Override
     public void visit(final CreateOneTimeCard command) {
@@ -212,9 +238,13 @@ public class BankingCommandVisitor implements CommandVisitor {
         String IBAN = commandInput.getAccount();
         String email = commandInput.getEmail();
         User user = CommandHelper.findUserByEmail(users, email);
-        if (user != null) {
-            Account account = CommandHelper.findAccountByIban(user, IBAN);
-            if (account != null) {
+        if (user == null) {
+            return;
+        }
+        Account account = CommandHelper.findAccountByIban(user, IBAN);
+        if (account == null) {
+            return;
+        }
                 Card newCard = new Card();
                 newCard.setOneTime(true);
                 String cardNumber = Utils.generateCardNumber();
@@ -229,12 +259,14 @@ public class BankingCommandVisitor implements CommandVisitor {
                 transcation.setCardHolder(user.getEmail());
                 transcation.setAccount(account.getIBAN());
                 user.getTranscations().add(transcation);
-            }
-        }
+
+
 
     }
     /**
+     * Deletes a card.
      *
+     * @param command the command containing the card details
      */
     @Override
     public void visit(final DeleteCard command) {
@@ -270,7 +302,9 @@ public class BankingCommandVisitor implements CommandVisitor {
     }
 
     /**
+     * Processes an online payment.
      *
+     * @param command the command containing the payment details
      */
     public void visit(final PayOnline command) {
         ArrayList<User> users = command.getUsers();
@@ -393,7 +427,9 @@ public class BankingCommandVisitor implements CommandVisitor {
     }
 
     /**
+     * Sends money from one account to another.
      *
+     * @param command the command containing the transfer details
      */
     public void visit(final SendMoney command) {
         CommandInput commandInput = command.getCommand();
@@ -486,11 +522,13 @@ public class BankingCommandVisitor implements CommandVisitor {
                 } else if (convertedAmount * 1000 % 10 == 0) {
                     formattedAmount2 = String
                             .format("%.2f %s", convertedAmount, receiver.getCurrency());
+                } else if (convertedAmount * 10000 % 10 == 0) {
+                    formattedAmount2 = String
+                            .format("%.3f %s", convertedAmount, receiver.getCurrency());
                 } else {
                     formattedAmount2 = String
                             .format("%.14f %s", convertedAmount, receiver.getCurrency());
                 }
-
                 transcation2.setAmount(formattedAmount2);
                 transcation2.setTransferType("received");
                 receiverUser.getTranscations().add(transcation2);
@@ -502,8 +540,11 @@ public class BankingCommandVisitor implements CommandVisitor {
 
         }
     }
+
     /**
+     * Sets an alias for an account.
      *
+     * @param command the command containing the alias details
      */
     public void visit(final SetAlias command) {
         ArrayList<User> users = command.getUsers();
@@ -520,7 +561,9 @@ public class BankingCommandVisitor implements CommandVisitor {
         }
     }
     /**
+     * Prints the list of transactions for a user.
      *
+     * @param command the command containing the transaction details
      */
     public void visit(final PrintTransactions command) {
         ArrayList<User> users = command.getUsers();
@@ -591,7 +634,9 @@ public class BankingCommandVisitor implements CommandVisitor {
         }
     }
     /**
+     * Sets the minimum balance for an account.
      *
+     * @param command the command containing the balance details
      */
     public void visit(final SetMinBalance command) {
         CommandInput commandInput = command.getCommandInput();
@@ -605,14 +650,16 @@ public class BankingCommandVisitor implements CommandVisitor {
 
     }
     /**
+     * Checks the status of a card.
      *
+     * @param command the command containing the card details
      */
-    public void visit(final CheckCardStatus commnad) {
-        CommandInput commandInput = commnad.getCommand();
-        ObjectNode node = commnad.getNode();
-        ArrayNode output = commnad.getOutput();
-        ObjectMapper mapper = commnad.getMapper();
-        ArrayList<User> users = commnad.getUsers();
+    public void visit(final CheckCardStatus command) {
+        CommandInput commandInput = command.getCommand();
+        ObjectNode node = command.getNode();
+        ArrayNode output = command.getOutput();
+        ObjectMapper mapper = command.getMapper();
+        ArrayList<User> users = command.getUsers();
         Account account = CommandHelper
                         .findAccountByCardNumberWithoutEmail(users, commandInput.getCardNumber());
         User user = CommandHelper
@@ -650,7 +697,9 @@ public class BankingCommandVisitor implements CommandVisitor {
 
     }
     /**
+     * Changes the interest rate of a savings account.
      *
+     * @param command the command containing the interest rate details
      */
     public void visit(final ChangeInterestRate command) {
         CommandInput commandInput = command.getCommand();
@@ -685,8 +734,11 @@ public class BankingCommandVisitor implements CommandVisitor {
         user.getTranscations().add(transcation);
 
     }
+
     /**
+     * Processes a split payment among multiple accounts.
      *
+     * @param command the command containing the split payment details
      */
     public void visit(final SplitPayment command) {
         CommandInput commandInput = command.getCommand();
@@ -741,7 +793,7 @@ public class BankingCommandVisitor implements CommandVisitor {
             transaction.setCurrency(baseCurrency);
             transaction.setAmountNotStr(splitAmount);
             transaction.setInvolvedAccounts(accountIdentifiers);
-            transaction.setError(insufficientFundsError); // Doar ultima eroare
+            transaction.setError(insufficientFundsError);
 
             for (User user : usersInSplit) {
                 user.getTranscations().add(transaction);
@@ -772,7 +824,9 @@ public class BankingCommandVisitor implements CommandVisitor {
     }
 
     /**
+     * Generates a report for an account.
      *
+     * @param command the command containing the report details
      */
     public void visit(final Report command) {
         CommandInput commandInput = command.getCommand();
@@ -807,11 +861,17 @@ public class BankingCommandVisitor implements CommandVisitor {
             return;
         }
 
-
         int startTimestamp = commandInput.getStartTimestamp();
         int endTimestamp = commandInput.getEndTimestamp();
 
-        ArrayList<Transcation> transactions = user.getTranscations();
+        TreeSet<Transcation> uniqueTransactions = new TreeSet<>(
+                Comparator.comparingInt(Transcation::getTimestamp)
+                        .thenComparing(Transcation::getDescription)
+                        .thenComparing(Transcation::getAmountNotStr)
+        );
+        uniqueTransactions.addAll(user.getTranscations());
+
+        ArrayList<Transcation> transactions = new ArrayList<>(uniqueTransactions);
         transactions.sort(Comparator.comparingInt(Transcation::getTimestamp));
 
         ArrayNode transactionsArray = mapper.createArrayNode();
@@ -819,6 +879,9 @@ public class BankingCommandVisitor implements CommandVisitor {
             if (transaction.getTimestamp() >= startTimestamp
                     && transaction.getTimestamp() <= endTimestamp) {
                 ObjectNode transactionNode = mapper.createObjectNode();
+                if (transaction.getAccount() != null && !transaction.getAccount().equals(IBAN)) {
+                   continue;
+                }
                 transactionNode.put("timestamp", transaction.getTimestamp());
                 transactionNode.put("description", transaction.getDescription());
                 if (transaction.getCurrency() != null) {
@@ -876,8 +939,11 @@ public class BankingCommandVisitor implements CommandVisitor {
 
         output.add(node);
     }
+
     /**
+     * Generates a spendings report for an account.
      *
+     * @param command the command containing the spendings report details
      */
     public void visit(final SpendingsReport command) {
         CommandInput commandInput = command.getCommand();
@@ -988,7 +1054,9 @@ public class BankingCommandVisitor implements CommandVisitor {
         output.add(node);
     }
     /**
+     * Adds interest to a savings account.
      *
+     * @param command the command containing the interest details
      */
     public void visit(final AddInterest command) {
         CommandInput commandInput = command.getCommand();

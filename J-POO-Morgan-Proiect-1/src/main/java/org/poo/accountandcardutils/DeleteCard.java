@@ -1,18 +1,21 @@
-package org.poo.commandutils;
+package org.poo.accountandcardutils;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.commandutils.CommandVisitor;
+import org.poo.commandutils.Visitable;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
-
 import java.util.ArrayList;
+
 
 @Getter
 @Setter
-public class CreateOneTimeCard extends AddAccount implements Visitable {
-    public CreateOneTimeCard(final CommandInput commandInput, final ArrayList<User> users) {
+public class DeleteCard extends AddAccount implements Visitable {
+    public DeleteCard(final CommandInput commandInput, final ArrayList<User> users) {
        super(commandInput, users);
     }
+
 
     /**
      * Accept method for the visitor pattern.
@@ -22,4 +25,5 @@ public class CreateOneTimeCard extends AddAccount implements Visitable {
     public void accept(final CommandVisitor visitor) {
         visitor.visit(this);
     }
+
 }
