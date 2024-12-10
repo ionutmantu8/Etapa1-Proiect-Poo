@@ -1,3 +1,69 @@
+commit cbf9e5d7acca926ee907ad6c0eba6c1195d04362
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Mon Dec 9 19:06:29 2024 +0200
+
+    Added javadoc in CommandHelper
+
+commit 5662ecf6383a4d6fe7b78202f6c34c70bd066e24
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Mon Dec 9 18:45:55 2024 +0200
+
+    All tests passing and added more packages.README on TODO
+
+commit 5ecc82edd853f1a59326bb5c9de39a12fb8aa065
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Mon Dec 9 16:39:21 2024 +0200
+
+    Passing test 18
+
+commit 84e42295fd6af798dd04d2370bbad158ede25580
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Sun Dec 8 20:03:34 2024 +0200
+
+    Added factory pattern for commands
+
+commit da0f6f4c385f9f0d520f570044405eca81da3d2c
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Sat Dec 7 21:31:21 2024 +0200
+
+    Test 17 modified
+
+commit 3124673d92fcbfa25da3ca21f5742e5cd33e9715
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Sat Dec 7 14:51:57 2024 +0200
+
+    checker changes
+
+commit c6edc94292061522e474cddb4aa43fdff266a7d2
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Sat Dec 7 01:53:27 2024 +0200
+
+    Solved a bit of the bugs of test 18
+
+commit 98bbecafae6ed2dbb949c22c26e11196b03a0516
+Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Fri Dec 6 18:16:10 2024 +0200
+
+    Test 18 problem with some balances
+
+commit 267f6a1b43e0efc291f5ae82ca6bbb168fc57d9e
+Author: ionut_gabriel.mantu <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Thu Dec 5 21:53:22 2024 +0200
+
+    Made the split payment functionality and solved coding style
+
+commit 2bb9409658a7ebf8bcd39f5150098da37181331a
+Author: ionut_gabriel.mantu <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Wed Dec 4 19:41:02 2024 +0200
+
+    Added minimum balance for accounts
+
+commit 1fca1e2282540e8750df172acdf010fbc2ea8b7a
+Author: ionut_gabriel.mantu <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Tue Dec 3 21:52:48 2024 +0200
+
+    Added Visitor Pattern for banking commands
+
 commit f55244c91aeefa058ef0a8d5edf1258489bbfa74
 Author: ionutmantu8 <ionut_gabriel.mantu@stud.acs.upb.ro>
 Date:   Mon Dec 2 16:42:46 2024 +0200
