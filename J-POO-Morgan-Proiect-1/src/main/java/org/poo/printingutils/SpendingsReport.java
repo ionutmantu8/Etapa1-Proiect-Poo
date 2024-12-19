@@ -8,11 +8,11 @@ import org.poo.commandutils.Visitable;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class SpendingsReport extends Report implements Visitable {
 
-    public SpendingsReport(final ArrayList<User> users, final CommandInput commandInput,
+    public SpendingsReport(final List<User> users, final CommandInput commandInput,
                            final ObjectNode node, final ObjectMapper mapper,
                            final ArrayNode output) {
         super(users, mapper, output, node, commandInput);

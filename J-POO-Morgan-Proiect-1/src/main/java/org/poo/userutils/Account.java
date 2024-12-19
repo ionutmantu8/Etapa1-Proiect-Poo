@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,7 +13,7 @@ public class Account {
    private String currency;
    private String accountType;
    private double balance;
-   private ArrayList<Card> cards;
+   private List<Card> cards;
    private int timpeStamp;
    private String alias;
    private double minBalance;

@@ -15,9 +15,24 @@ import org.poo.printingutils.PrintUsers;
 import org.poo.printingutils.Report;
 import org.poo.printingutils.SpendingsReport;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class BankingCommandFactory extends CommandFactory {
+
+
+    private static BankingCommandFactory instance;
+    private BankingCommandFactory() {
+    }
+    public static BankingCommandFactory getSingletonInstance() {
+        if (instance == null) {
+            synchronized (BankingCommandFactory.class) {
+                if (instance == null) {
+                    instance = new BankingCommandFactory();
+                }
+            }
+        }
+        return instance;
+    }
     /**
      * Creates a command based on the command input.
      * @param commandInput the command input
@@ -29,14 +44,9 @@ public class BankingCommandFactory extends CommandFactory {
      * @return the created command
      */
     @Override
-    public Visitable createCommand(
-            final CommandInput commandInput,
-            final ArrayList<User> usersList,
-            final ArrayList<ExchangeRate> exchangeRates,
-            final ObjectMapper mapper,
-            final ArrayNode output,
-            final ObjectNode node) {
-
+    public Visitable createCommand(final CommandInput commandInput, final List<User> usersList,
+                                   final List<ExchangeRate> exchangeRates, final ObjectMapper mapper,
+                                   final ArrayNode output, final ObjectNode node) {
         return switch (commandInput.getCommand()) {
             case "printUsers" ->
                     new PrintUsers(usersList, node, mapper, output, commandInput);
@@ -79,4 +89,6 @@ public class BankingCommandFactory extends CommandFactory {
                             "Unknown command: " + commandInput.getCommand());
         };
     }
+
 }
+

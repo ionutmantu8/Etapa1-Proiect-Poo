@@ -9,10 +9,11 @@ import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 import org.poo.printingutils.PrintUsers;
 
-import java.util.ArrayList;
+import java.util.List;
+
 
 public class CheckCardStatus extends PrintUsers implements Visitable {
-    public CheckCardStatus(final ArrayList<User> users, final ObjectNode node,
+    public CheckCardStatus(final List<User> users, final ObjectNode node,
                            final ObjectMapper mapper, final ArrayNode output,
                            final CommandInput command) {
         super(users, node, mapper, output, command);

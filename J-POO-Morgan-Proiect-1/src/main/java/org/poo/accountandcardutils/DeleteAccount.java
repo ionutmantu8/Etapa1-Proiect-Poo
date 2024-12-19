@@ -11,13 +11,13 @@ import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 import org.poo.printingutils.PrintUsers;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 public class DeleteAccount extends PrintUsers implements Visitable {
 
-    public DeleteAccount(final ArrayList<User> users, final ObjectNode node,
+    public DeleteAccount(final List<User> users, final ObjectNode node,
                          final ObjectMapper mapper, final ArrayNode output,
                          final CommandInput command) {
        super(users, node, mapper, output, command);

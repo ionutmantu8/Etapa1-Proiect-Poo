@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public abstract class CommandFactory {
     /**
@@ -15,8 +15,8 @@ public abstract class CommandFactory {
      */
     public abstract Visitable createCommand(
             CommandInput commandInput,
-            ArrayList<User> usersList,
-            ArrayList<ExchangeRate> exchangeRates,
+            List<User> usersList,
+            List<ExchangeRate> exchangeRates,
             ObjectMapper mapper,
             ArrayNode output,
             ObjectNode node);

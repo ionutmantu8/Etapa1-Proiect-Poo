@@ -5,7 +5,7 @@ import org.poo.userutils.Account;
 import org.poo.userutils.Card;
 import org.poo.userutils.User;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +26,7 @@ public final class CommandHelper {
      * @param accountEmail the email address of the user
      * @return the user with the specified email address, or null if not found
      */
-    public static User findUserByEmail(final ArrayList<User> usersList,
+    public static User findUserByEmail(final List<User> usersList,
                                        final String accountEmail) {
         for (User user : usersList) {
             if (user.getEmail().equals(accountEmail)) {
@@ -87,7 +87,7 @@ public final class CommandHelper {
      * @return a map representing the graph of exchange rates
      */
     public static Map<String, Map<String, Double>> buildGraph(
-            final ArrayList<ExchangeRate> exchangeRates) {
+            final List<ExchangeRate> exchangeRates) {
         Map<String, Map<String, Double>> graph = new HashMap<>();
 
         for (ExchangeRate rate : exchangeRates) {
@@ -154,7 +154,7 @@ public final class CommandHelper {
      * @return the converted amount
      */
     public static double convertCurrency(final double amount, final String from, final String to,
-                                         final ArrayList<ExchangeRate> exchangeRates) {
+                                         final List<ExchangeRate> exchangeRates) {
         Map<String, Map<String, Double>> graph = buildGraph(exchangeRates);
         double rate = findBestRate(from, to, graph);
         return amount * rate;
@@ -168,7 +168,7 @@ public final class CommandHelper {
      * @param IBAN the IBAN of the account
      * @return the account with the specified IBAN, or null if not found
      */
-    public static Account findAccountByIBANWithoutEmail(final ArrayList<User> users,
+    public static Account findAccountByIBANWithoutEmail(final List<User> users,
                                                         final String IBAN) {
         for (User user : users) {
             for (Account account : user.getAccounts()) {
@@ -187,7 +187,7 @@ public final class CommandHelper {
      * @param identifier the IBAN or alias of the account
      * @return the account with the specified IBAN or alias, or null if not found
      */
-    public static Account findAccountByIBANOrAlias(final ArrayList<User> users,
+    public static Account findAccountByIBANOrAlias(final List<User> users,
                                                    final String identifier) {
        for (User user : users) {
            for (Account account : user.getAccounts()) {
@@ -208,7 +208,7 @@ public final class CommandHelper {
      * @param cardNumber the number of the card
      * @return the card with the specified number, or null if not found
      */
-    public static Card findCardByNumberWithoutEmail(final ArrayList<User> users,
+    public static Card findCardByNumberWithoutEmail(final List<User> users,
                                                      final String cardNumber) {
         for (User user : users) {
             for (Account account : user.getAccounts()) {
@@ -228,7 +228,7 @@ public final class CommandHelper {
      * @param cardNumber the number of the card
      * @return the account associated with the specified card number, or null if not found
      */
-    public static Account findAccountByCardNumberWithoutEmail(final ArrayList<User> users,
+    public static Account findAccountByCardNumberWithoutEmail(final List<User> users,
                                                                final String cardNumber) {
         for (User user : users) {
             for (Account account : user.getAccounts()) {
@@ -248,7 +248,7 @@ public final class CommandHelper {
      * @param cardNumber the number of the card
      * @return the user associated with the specified card number, or null if not found
      */
-    public static User findUserByCardNumberWithoutEmail(final ArrayList<User> users,
+    public static User findUserByCardNumberWithoutEmail(final List<User> users,
                                                          final String cardNumber) {
         for (User user : users) {
             for (Account account : user.getAccounts()) {
@@ -269,7 +269,7 @@ public final class CommandHelper {
      * @param IBAN the IBAN of the account
      * @return the user associated with the specified IBAN, or null if not found
      */
-    public static User findUserByIBAN(final ArrayList<User> users,
+    public static User findUserByIBAN(final List<User> users,
                                                         final String IBAN) {
         for (User user : users) {
             for (Account account : user.getAccounts()) {
@@ -287,7 +287,7 @@ public final class CommandHelper {
      * @param identifier the IBAN or alias of the account
      * @return the user associated with the specified IBAN or alias, or null if not found
      */
-    public static User findUserByIBANOrAlias(final ArrayList<User> users,
+    public static User findUserByIBANOrAlias(final List<User> users,
                                       final String identifier) {
         for (User user : users) {
             for (Account account : user.getAccounts()) {

@@ -10,14 +10,14 @@ import org.poo.commandutils.Visitable;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 public class PrintTransactions extends PrintUsers implements Visitable {
 
 
-    public PrintTransactions(final ArrayList<User> users, final ObjectNode node,
+    public PrintTransactions(final List<User> users, final ObjectNode node,
                              final ObjectMapper mapper, final ArrayNode output,
                              final CommandInput command) {
       super(users, node, mapper, output, command);

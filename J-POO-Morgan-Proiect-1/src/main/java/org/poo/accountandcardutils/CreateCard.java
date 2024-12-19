@@ -6,14 +6,14 @@ import org.poo.commandutils.CommandVisitor;
 import org.poo.commandutils.Visitable;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
-import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
 @Setter
 public class CreateCard extends AddAccount implements Visitable {
 
-    public CreateCard(final CommandInput commandInput, final ArrayList<User> users) {
+    public CreateCard(final CommandInput commandInput, final List<User> users) {
         super(commandInput, users);
     }
 

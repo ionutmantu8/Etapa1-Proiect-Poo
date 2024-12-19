@@ -9,10 +9,10 @@ import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 import org.poo.printingutils.PrintUsers;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class ChangeInterestRate extends PrintUsers implements Visitable {
-    public ChangeInterestRate(final ArrayList<User> users, final CommandInput commandInput,
+    public ChangeInterestRate(final List<User> users, final CommandInput commandInput,
                               final ObjectMapper mapper, final ObjectNode node,
                               final ArrayNode output) {
         super(users, node, mapper, output, commandInput);

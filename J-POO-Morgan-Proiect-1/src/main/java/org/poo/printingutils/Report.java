@@ -10,12 +10,12 @@ import org.poo.commandutils.Visitable;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 public class Report extends PrintUsers implements Visitable {
-   public Report(final ArrayList<User> users, final ObjectMapper mapper,
+   public Report(final List<User> users, final ObjectMapper mapper,
                  final ArrayNode output, final ObjectNode node,
                  final CommandInput commandInput) {
         super(users, node, mapper, output, commandInput);

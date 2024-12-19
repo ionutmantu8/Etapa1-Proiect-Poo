@@ -20,10 +20,8 @@ import org.poo.printingutils.PrintUsers;
 import org.poo.printingutils.Report;
 import org.poo.printingutils.SpendingsReport;
 
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
-import java.util.TreeSet;
 
 
 public class BankingCommandVisitor implements CommandVisitor {
@@ -35,7 +33,7 @@ public class BankingCommandVisitor implements CommandVisitor {
     @Override
     public void visit(final AddAccount command) {
         CommandInput commandInput = command.getCommandInput();
-        ArrayList<User> usersList = command.getUsers();
+        List<User> usersList = command.getUsers();
         String accountEmail = commandInput.getEmail();
         User user = CommandHelper.findUserByEmail(usersList, accountEmail);
         if (user != null) {
@@ -60,7 +58,7 @@ public class BankingCommandVisitor implements CommandVisitor {
      */
     @Override
     public void visit(final AddFunds command) {
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         CommandInput commandInput = command.getCommandInput();
 
         for (User user : users) {
@@ -83,7 +81,7 @@ public class BankingCommandVisitor implements CommandVisitor {
     @Override
     public void visit(final CreateCard command) {
         CommandInput commandInput = command.getCommandInput();
-        ArrayList<User> userList = command.getUsers();
+        List<User> userList = command.getUsers();
         String IBAN = commandInput.getAccount();
         String email = commandInput.getEmail();
         User user = CommandHelper.findUserByEmail(userList, email);
@@ -120,7 +118,7 @@ public class BankingCommandVisitor implements CommandVisitor {
     public void visit(final PrintUsers command) {
         ObjectNode node = command.getNode();
         CommandInput commandInput = command.getCommand();
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         ArrayNode output = command.getOutput();
         ObjectMapper mapper = command.getMapper();
 
@@ -168,7 +166,7 @@ public class BankingCommandVisitor implements CommandVisitor {
     @Override
     public void visit(final DeleteAccount command) {
         CommandInput commandInput = command.getCommand();
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         ObjectNode node = command.getNode();
         ArrayNode output = command.getOutput();
 
@@ -233,7 +231,7 @@ public class BankingCommandVisitor implements CommandVisitor {
      */
     @Override
     public void visit(final CreateOneTimeCard command) {
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         CommandInput commandInput = command.getCommandInput();
         String IBAN = commandInput.getAccount();
         String email = commandInput.getEmail();
@@ -271,7 +269,7 @@ public class BankingCommandVisitor implements CommandVisitor {
     @Override
     public void visit(final DeleteCard command) {
         CommandInput commandInput = command.getCommandInput();
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         String email = commandInput.getEmail();
         String cardNumber = commandInput.getCardNumber();
         User user = CommandHelper.findUserByEmail(users, email);
@@ -307,8 +305,8 @@ public class BankingCommandVisitor implements CommandVisitor {
      * @param command the command containing the payment details
      */
     public void visit(final PayOnline command) {
-        ArrayList<User> users = command.getUsers();
-        ArrayList<ExchangeRate> exchangeRates = command.getExchangeRates();
+        List<User> users = command.getUsers();
+        List<ExchangeRate> exchangeRates = command.getExchangeRates();
         ObjectNode node = command.getNode();
         ObjectMapper mapper = command.getMapper();
         ArrayNode output = command.getOutput();
@@ -433,8 +431,8 @@ public class BankingCommandVisitor implements CommandVisitor {
      */
     public void visit(final SendMoney command) {
         CommandInput commandInput = command.getCommand();
-        ArrayList<User> users = command.getUsers();
-        ArrayList<ExchangeRate> exchangeRates = command.getExchangeRates();
+        List<User> users = command.getUsers();
+        List<ExchangeRate> exchangeRates = command.getExchangeRates();
 
         String senderIdentifier = commandInput.getAccount();
         String receiverIdentifier = commandInput.getReceiver();
@@ -471,27 +469,11 @@ public class BankingCommandVisitor implements CommandVisitor {
 
 
             if (sender.getCurrency().equals(receiver.getCurrency())) {
-                Transcation transcation = new Transcation();
-                transcation.setTimestamp(commandInput.getTimestamp());
-                transcation.setDescription(commandInput.getDescription());
-                transcation.setSenderIBAN(sender.getIBAN());
-                transcation.setReceiverIBAN(receiver.getIBAN());
-                String formattedAmount = String
-                        .format("%.1f %s", commandInput.getAmount(), sender.getCurrency());
-                transcation.setAmount(formattedAmount);
-                transcation.setTransferType("sent");
+                Transcation transcation = getTranscation(commandInput, sender, receiver, "sent");
                 senderUser.getTranscations().add(transcation);
                 sender.setBalance(sender.getBalance() - amount);
                 receiver.setBalance(receiver.getBalance() + amount);
-                Transcation transcation2 = new Transcation();
-                transcation2.setTimestamp(commandInput.getTimestamp());
-                transcation2.setDescription(commandInput.getDescription());
-                transcation2.setSenderIBAN(sender.getIBAN());
-                transcation2.setReceiverIBAN(receiver.getIBAN());
-                String formattedAmount2 = String
-                        .format("%.1f %s", commandInput.getAmount(), receiver.getCurrency());
-                transcation2.setAmount(formattedAmount2);
-                transcation2.setTransferType("received");
+                Transcation transcation2 = getTranscation(commandInput, sender, receiver, "received");
                 receiverUser.getTranscations().add(transcation2);
             } else {
                 double convertedAmount =
@@ -499,15 +481,7 @@ public class BankingCommandVisitor implements CommandVisitor {
                                 .convertCurrency(amount, sender.getCurrency(),
                                         receiver.getCurrency(), exchangeRates);
                 sender.setBalance(sender.getBalance() - amount);
-                Transcation transcation = new Transcation();
-                transcation.setTimestamp(commandInput.getTimestamp());
-                transcation.setDescription(commandInput.getDescription());
-                transcation.setSenderIBAN(sender.getIBAN());
-                transcation.setReceiverIBAN(receiver.getIBAN());
-                String formattedAmount = String
-                        .format("%.1f %s", commandInput.getAmount(), sender.getCurrency());
-                transcation.setAmount(formattedAmount);
-                transcation.setTransferType("sent");
+                Transcation transcation = getTranscation(commandInput, sender, receiver, "sent");
                 senderUser.getTranscations().add(transcation);
                 receiver.setBalance(receiver.getBalance() + convertedAmount);
                 Transcation transcation2 = new Transcation();
@@ -516,29 +490,27 @@ public class BankingCommandVisitor implements CommandVisitor {
                 transcation2.setSenderIBAN(sender.getIBAN());
                 transcation2.setReceiverIBAN(receiver.getIBAN());
                 String formattedAmount2;
-                if (convertedAmount * 100 % 10 == 0) {
-                    formattedAmount2 = String
-                            .format("%.1f %s", convertedAmount, receiver.getCurrency());
-                } else if (convertedAmount * 1000 % 10 == 0) {
-                    formattedAmount2 = String
-                            .format("%.2f %s", convertedAmount, receiver.getCurrency());
-                } else if (convertedAmount * 10000 % 10 == 0) {
-                    formattedAmount2 = String
-                            .format("%.3f %s", convertedAmount, receiver.getCurrency());
-                } else {
                     formattedAmount2 = String
                             .format("%.14f %s", convertedAmount, receiver.getCurrency());
-                }
                 transcation2.setAmount(formattedAmount2);
                 transcation2.setTransferType("received");
                 receiverUser.getTranscations().add(transcation2);
             }
-
-
-
-
-
         }
+    }
+
+    private static Transcation getTranscation(final CommandInput commandInput, final Account sender,
+                                              final Account receiver, final String sent) {
+        Transcation transcation = new Transcation();
+        transcation.setTimestamp(commandInput.getTimestamp());
+        transcation.setDescription(commandInput.getDescription());
+        transcation.setSenderIBAN(sender.getIBAN());
+        transcation.setReceiverIBAN(receiver.getIBAN());
+        String formattedAmount = String
+                .format("%.1f %s", commandInput.getAmount(), sender.getCurrency());
+        transcation.setAmount(formattedAmount);
+        transcation.setTransferType(sent);
+        return transcation;
     }
 
     /**
@@ -547,7 +519,7 @@ public class BankingCommandVisitor implements CommandVisitor {
      * @param command the command containing the alias details
      */
     public void visit(final SetAlias command) {
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         CommandInput commandInput = command.getCommandInput();
         String email = commandInput.getEmail();
         String IBAN = commandInput.getAccount();
@@ -566,7 +538,7 @@ public class BankingCommandVisitor implements CommandVisitor {
      * @param command the command containing the transaction details
      */
     public void visit(final PrintTransactions command) {
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         ObjectMapper mapper = command.getMapper();
         ArrayNode output = command.getOutput();
         ObjectNode node = command.getNode();
@@ -576,7 +548,7 @@ public class BankingCommandVisitor implements CommandVisitor {
         User user = CommandHelper.findUserByEmail(users, email);
 
         if (user != null) {
-            ArrayList<Transcation> transactions = user.getTranscations();
+            List<Transcation> transactions = user.getTranscations();
             transactions.sort(Comparator.comparingInt(Transcation::getTimestamp));
 
             ArrayNode transactionsArray = mapper.createArrayNode();
@@ -640,7 +612,7 @@ public class BankingCommandVisitor implements CommandVisitor {
      */
     public void visit(final SetMinBalance command) {
         CommandInput commandInput = command.getCommandInput();
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         Account account = CommandHelper
                 .findAccountByIBANWithoutEmail(users, commandInput.getAccount());
         if (account == null) {
@@ -659,7 +631,7 @@ public class BankingCommandVisitor implements CommandVisitor {
         ObjectNode node = command.getNode();
         ArrayNode output = command.getOutput();
         ObjectMapper mapper = command.getMapper();
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         Account account = CommandHelper
                         .findAccountByCardNumberWithoutEmail(users, commandInput.getCardNumber());
         User user = CommandHelper
@@ -703,7 +675,7 @@ public class BankingCommandVisitor implements CommandVisitor {
      */
     public void visit(final ChangeInterestRate command) {
         CommandInput commandInput = command.getCommand();
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         ObjectNode node = command.getNode();
         ObjectMapper mapper = command.getMapper();
         ArrayNode output = command.getOutput();
@@ -742,15 +714,15 @@ public class BankingCommandVisitor implements CommandVisitor {
      */
     public void visit(final SplitPayment command) {
         CommandInput commandInput = command.getCommand();
-        ArrayList<User> users = command.getUsers();
-        ArrayList<ExchangeRate> exchangeRates = command.getExchangeRates();
+        List<User> users = command.getUsers();
+        List<ExchangeRate> exchangeRates = command.getExchangeRates();
         double totalAmount = commandInput.getAmount();
         String baseCurrency = commandInput.getCurrency();
         List<String> accountIdentifiers = commandInput.getAccounts();
         int timestamp = commandInput.getTimestamp();
 
-        ArrayList<Account> accounts = new ArrayList<>();
-        ArrayList<User> usersInSplit = new ArrayList<>();
+        List<Account> accounts = new ArrayList<>();
+        List<User> usersInSplit = new ArrayList<>();
         String insufficientFundsError = null;
         for (String iban : accountIdentifiers) {
             Account account = CommandHelper.findAccountByIBANWithoutEmail(users, iban);
@@ -765,7 +737,7 @@ public class BankingCommandVisitor implements CommandVisitor {
         }
 
         double splitAmount = totalAmount / accounts.size();
-        ArrayList<Double> convertedAmounts = new ArrayList<>();
+        List<Double> convertedAmounts = new ArrayList<>();
 
         for (Account account : accounts) {
             double amountInAccountCurrency = splitAmount;
@@ -830,7 +802,7 @@ public class BankingCommandVisitor implements CommandVisitor {
      */
     public void visit(final Report command) {
         CommandInput commandInput = command.getCommand();
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         ObjectNode node = command.getNode();
         ObjectMapper mapper = command.getMapper();
         ArrayNode output = command.getOutput();
@@ -871,7 +843,7 @@ public class BankingCommandVisitor implements CommandVisitor {
         );
         uniqueTransactions.addAll(user.getTranscations());
 
-        ArrayList<Transcation> transactions = new ArrayList<>(uniqueTransactions);
+        List<Transcation> transactions = new ArrayList<>(uniqueTransactions);
         transactions.sort(Comparator.comparingInt(Transcation::getTimestamp));
 
         ArrayNode transactionsArray = mapper.createArrayNode();
@@ -947,7 +919,7 @@ public class BankingCommandVisitor implements CommandVisitor {
      */
     public void visit(final SpendingsReport command) {
         CommandInput commandInput = command.getCommand();
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         ObjectNode node = command.getNode();
         ObjectMapper mapper = command.getMapper();
         ArrayNode output = command.getOutput();
@@ -996,7 +968,7 @@ public class BankingCommandVisitor implements CommandVisitor {
         outputNode.put("currency", account.getCurrency());
 
         ArrayNode transactionsArray = mapper.createArrayNode();
-        ArrayList<Commerciants> reportCommerciants = new ArrayList<>();
+        List<Commerciants> reportCommerciants = new ArrayList<>();
 
         for (Transcation transaction : user.getTranscations()) {
             if ((transaction.getDescription().equals("Card payment")
@@ -1060,7 +1032,7 @@ public class BankingCommandVisitor implements CommandVisitor {
      */
     public void visit(final AddInterest command) {
         CommandInput commandInput = command.getCommand();
-        ArrayList<User> users = command.getUsers();
+        List<User> users = command.getUsers();
         ObjectNode node = command.getNode();
         ObjectMapper mapper = command.getMapper();
         ArrayNode output = command.getOutput();

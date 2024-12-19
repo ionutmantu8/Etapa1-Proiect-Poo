@@ -10,18 +10,18 @@ import org.poo.commandutils.Visitable;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 public class PrintUsers implements Visitable {
-    private final ArrayList<User> users;
+    private final List<User> users;
     private final ObjectNode node;
     private final ObjectMapper mapper;
     private final ArrayNode output;
     private final CommandInput command;
 
-    public PrintUsers(final ArrayList<User> users, final ObjectNode node,
+    public PrintUsers(final List<User> users, final ObjectNode node,
                       final ObjectMapper mapper, final ArrayNode output,
                       final CommandInput command) {
         this.users = users;

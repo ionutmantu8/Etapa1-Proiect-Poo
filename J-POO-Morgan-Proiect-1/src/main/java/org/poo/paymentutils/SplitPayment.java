@@ -6,11 +6,11 @@ import org.poo.commandutils.Visitable;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class SplitPayment extends SendMoney implements Visitable {
-    public SplitPayment(final  CommandInput commandInput, final ArrayList<User> usersList,
-                        final ArrayList<ExchangeRate> exchangeRates) {
+    public SplitPayment(final  CommandInput commandInput, final List<User> usersList,
+                        final List<ExchangeRate> exchangeRates) {
         super(usersList, exchangeRates, commandInput);
     }
     /**

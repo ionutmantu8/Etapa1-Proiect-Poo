@@ -16,6 +16,7 @@ import org.poo.userutils.User;
 import org.poo.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Bank {
     /**
@@ -27,7 +28,7 @@ public class Bank {
         ArrayNode output = mapper.createArrayNode();
 
         UserInput[] users = inputData.getUsers();
-        ArrayList<User> usersList = new ArrayList<>();
+        List<User> usersList = new ArrayList<>();
         Utils.resetRandom();
         for (int i = 0; i < users.length; i++) {
             usersList.add(new User());
@@ -36,8 +37,26 @@ public class Bank {
             usersList.get(i).setEmail(users[i].getEmail());
         }
 
+        List<ExchangeRate> exchangeRates = getExchangeRates(inputData);
+
+        CommandVisitor visitor = new BankingCommandVisitor();
+        CommandFactory factory = BankingCommandFactory.getSingletonInstance();
+        CommandInput[] commandInputs = inputData.getCommands();
+        for (CommandInput commandInput : commandInputs) {
+            ObjectNode node = mapper.createObjectNode();
+            Visitable command = factory.createCommand(
+                    commandInput, usersList, exchangeRates, mapper, output, node);
+            if (command != null) {
+                command.accept(visitor);
+            }
+        }
+
+        return output;
+    }
+
+    private static List<ExchangeRate> getExchangeRates(ObjectInput inputData) {
         ExchangeInput[] exchangeInputs = inputData.getExchangeRates();
-        ArrayList<ExchangeRate> exchangeRates = new ArrayList<>();
+        List<ExchangeRate> exchangeRates = new ArrayList<>();
         for (ExchangeInput input : exchangeInputs) {
             ExchangeRate directRate = new ExchangeRate();
             directRate.setFromCurrency(input.getFrom());
@@ -51,19 +70,6 @@ public class Bank {
             reverseRate.setRate(1 / input.getRate());
             exchangeRates.add(reverseRate);
         }
-
-        CommandVisitor visitor = new BankingCommandVisitor();
-        CommandFactory factory = new BankingCommandFactory();
-        CommandInput[] commandInputs = inputData.getCommands();
-        for (CommandInput commandInput : commandInputs) {
-            ObjectNode node = mapper.createObjectNode();
-            Visitable command = factory.createCommand(
-                    commandInput, usersList, exchangeRates, mapper, output, node);
-            if (command != null) {
-                command.accept(visitor);
-            }
-        }
-
-        return output;
+        return exchangeRates;
     }
 }

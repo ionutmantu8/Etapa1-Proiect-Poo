@@ -11,21 +11,21 @@ import org.poo.commandutils.Visitable;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 public class PayOnline implements Visitable {
-    private final ArrayList<User> users;
+    private final List<User> users;
     private final ObjectNode node;
     private final ObjectMapper mapper;
     private final ArrayNode output;
     private final CommandInput command;
-    private final ArrayList<ExchangeRate> exchangeRates;
+    private final List<ExchangeRate> exchangeRates;
 
-    public PayOnline(final ArrayList<User> users, final ObjectNode node,
+    public PayOnline(final List<User> users, final ObjectNode node,
                      final ObjectMapper mapper, final ArrayNode output,
-                     final CommandInput command, final ArrayList<ExchangeRate> exchangeRates) {
+                     final CommandInput command, final List<ExchangeRate> exchangeRates) {
         this.users = users;
         this.node = node;
         this.mapper = mapper;

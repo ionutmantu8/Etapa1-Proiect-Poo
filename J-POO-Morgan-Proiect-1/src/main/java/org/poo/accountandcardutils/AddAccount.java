@@ -6,13 +6,14 @@ import org.poo.commandutils.Visitable;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 
-import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 public class AddAccount implements Visitable {
     private final CommandInput commandInput;
-    private final ArrayList<User> users;
+    private final List<User> users;
 
-    public AddAccount(final CommandInput commandInput, final ArrayList<User> users) {
+    public AddAccount(final CommandInput commandInput, final List<User> users) {
         this.commandInput = commandInput;
         this.users = users;
     }

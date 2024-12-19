@@ -9,13 +9,13 @@ import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 import org.poo.printingutils.Report;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class AddInterest extends Report implements Visitable {
 
-    public AddInterest(final ArrayList<User> users, final CommandInput commandInput,
-                           final ObjectNode node, final ObjectMapper mapper,
-                           final ArrayNode output) {
+    public AddInterest(final List<User> users, final CommandInput commandInput,
+                       final ObjectNode node, final ObjectMapper mapper,
+                       final ArrayNode output) {
         super(users, mapper, output, node, commandInput);
     }
     /**

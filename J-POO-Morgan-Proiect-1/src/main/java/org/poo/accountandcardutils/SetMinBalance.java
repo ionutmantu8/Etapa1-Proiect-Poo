@@ -7,12 +7,12 @@ import org.poo.commandutils.Visitable;
 import org.poo.fileio.CommandInput;
 import org.poo.userutils.User;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 public class SetMinBalance extends AddAccount implements Visitable {
-    public SetMinBalance(final CommandInput commandInput, final ArrayList<User> users) {
+    public SetMinBalance(final CommandInput commandInput, final List<User> users) {
         super(commandInput, users);
     }
     /**
