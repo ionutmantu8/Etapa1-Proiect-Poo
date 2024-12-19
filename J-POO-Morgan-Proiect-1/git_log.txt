@@ -1,3 +1,9 @@
+commit e98f2a05e7439fd1664763728dfae0e1cbebb37e
+Author: ionut_gabriel.mantu <ionut_gabriel.mantu@stud.acs.upb.ro>
+Date:   Thu Dec 19 04:30:33 2024 +0200
+
+    Added Singleton Pattern for factory
+
 commit 9ce4503a6bcf39772cd5c856c9720fc2aa2c3b5f
 Author: ionut_gabriel.mantu <ionut_gabriel.mantu@stud.acs.upb.ro>
 Date:   Tue Dec 10 22:46:25 2024 +0200

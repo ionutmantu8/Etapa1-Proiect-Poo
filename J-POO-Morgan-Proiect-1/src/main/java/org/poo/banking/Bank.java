@@ -40,10 +40,10 @@ public class Bank {
         List<ExchangeRate> exchangeRates = getExchangeRates(inputData);
 
         CommandVisitor visitor = new BankingCommandVisitor();
-        CommandFactory factory = BankingCommandFactory.getSingletonInstance();
         CommandInput[] commandInputs = inputData.getCommands();
         for (CommandInput commandInput : commandInputs) {
             ObjectNode node = mapper.createObjectNode();
+            CommandFactory factory = BankingCommandFactory.getSingletonInstance();
             Visitable command = factory.createCommand(
                     commandInput, usersList, exchangeRates, mapper, output, node);
             if (command != null) {
